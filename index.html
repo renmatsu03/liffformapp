@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>講座申込フォーム</title>
+    <title>#講座申込フォーム</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 </head>
 <body>
@@ -128,7 +128,7 @@
                     return $(this).val();
                 }).get();
 
-                const msg = `名前: ${name}\n学年: ${grade}\n購入コマ数: ${selectedKoma}コマ\n選択した講座:\n${selectedLectures.join("\n")}`;
+                const msg = `#講座申込フォーム\n名前: ${name}\n学年: ${grade}\n購入コマ数: ${selectedKoma}コマ\n選択した講座:\n${selectedLectures.join("\n")}`;
 
                 if (liff.isInClient()) {
                     liff.sendMessages([{ type: 'text', text: msg }])
