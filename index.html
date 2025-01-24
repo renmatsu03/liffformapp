@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>#中学受験ニガテ克服講座-講座申込フォーム</title>
+    <title>#中学受験ニガテ克服/講座申込フォーム</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 </head>
 <body>
@@ -34,11 +34,10 @@
             <select class="form-control w-100 mt-1" id="koma-select" required>
                 <option value="" disabled selected>選択してください</option>
                 <option value="free">★第1回分無料</option>
-                <option value="1">1コマ ★第1回分無料特典付き</option>
-                <option value="3">3コマ ★第1回分無料特典付き</option>
-                <option value="5">5コマ ★第1回分無料特典付き</option>
-                <option value="10">10コ ★第1回分無料特典付きマ</option>
-                <option value="20">20コマ ★第1回分無料特典付き</option>
+                <option value="3">3コマ</option>
+                <option value="5">5コマ</option>
+                <option value="10">10コマ</option>
+                <option value="20">20コマ</option>
             </select>
         </div>
 
@@ -57,24 +56,24 @@
         $(document).ready(function () {
             const liffId = "2006792721-3gajN1ll"; // LIFF ID
             const lectures = [
-                "第1回：2/16（日） 9:00～10:00<br>割合と比 食塩水",
-                "第2回：2/23（日） 9:00～10:00<br>割合と比 売買損益",
-                "第3回：3/2（日） 9:00～10:00<br>割合と比 倍数算",
-                "第4回：3/9（日） 9:00～10:00<br>速さ 旅人算",
-                "第5回：3/16（日） 9:00～10:00<br>速さ 速さと比",
-                "第6回：3/23（日） 9:00～10:00<br>速さ ダイヤグラム",
+                "第1回：2/16（日） 9:00～10:00<br>割合と比　食塩水",
+                "第2回：2/23（日） 9:00～10:00<br>割合と比　売買損益",
+                "第3回：3/2（日） 9:00～10:00<br>割合と比　倍数算",
+                "第4回：3/9（日） 9:00～10:00<br>速さ　旅人算",
+                "第5回：3/16（日） 9:00～10:00<br>速さ　速さと比",
+                "第6回：3/23（日） 9:00～10:00<br>速さ　ダイヤグラム",
                 "第7回：3/30（日） 9:00～10:00<br>和差算",
                 "第8回：4/6（日） 9:00～10:00<br>つるかめ算",
                 "第9回：4/13（日） 9:00～10:00<br>仕事算",
-                "第10回：4/20（日） 9:00～10:00<br>平面図形 面積の比、辺の比",
-                "第11回：4/27（日） 9:00～10:00<br>平面図形 多角形",
-                "第12回：5/4（日） 9:00～10:00<br>平面図形 図形の移動",
-                "第13回：5/11（日） 9:00～10:00<br>数と性質 規則性",
-                "第14回：5/18（日） 9:00～10:00<br>数と性質 約数倍数",
-                "第15回：5/25（日） 9:00～10:00<br>数と性質 分数や少数といった単純計算",
-                "第16回：6/8（日） 9:00～10:00<br>立体図形 体積、表面積",
-                "第17回：6/15（日） 9:00～10:00<br>立体図形 切断",
-                "第18回：6/22（日） 9:00～10:00<br>立体図形 回転体",
+                "第10回：4/20（日） 9:00～10:00<br>平面図形　面積の比、辺の比",
+                "第11回：4/27（日） 9:00～10:00<br>平面図形　多角形",
+                "第12回：5/4（日） 9:00～10:00<br>平面図形　図形の移動",
+                "第13回：5/11（日） 9:00～10:00<br>数と性質　規則性",
+                "第14回：5/18（日） 9:00～10:00<br>数と性質　約数倍数",
+                "第15回：5/25（日） 9:00～10:00<br>数と性質　分数や少数といった単純計算",
+                "第16回：6/8（日） 9:00～10:00<br>立体図形　体積、表面積",
+                "第17回：6/15（日） 9:00～10:00<br>立体図形　切断",
+                "第18回：6/22（日） 9:00～10:00<br>立体図形　回転体",
                 "第19回：6/29（日） 9:00～10:00<br>総まとめ演習",
                 "第20回：7/6（日） 9:00～10:00<br>総まとめ演習"
             ];
@@ -91,25 +90,43 @@
 
             // コマ数に応じた選択制御
             $("#koma-select").change(function () {
-                const maxSelection = $(this).val() === "free" ? 1 : parseInt($(this).val());
-                $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
+                const selectionType = $(this).val();
+                let maxSelection;
 
-                if ($(this).val() === "free") {
-                    // 第1回固定選択
-                    $("#lecture-0").prop("checked", true).prop("disabled", true);
-                    $(".lecture-checkbox:not(#lecture-0)").prop("disabled", true);
-                } else {
-                    // 第1回固定選択＋追加選択可能
-                    $("#lecture-0").prop("checked", true).prop("disabled", true);
-                    $(".lecture-checkbox:not(#lecture-0)").on("change", function () {
-                        if ($(".lecture-checkbox:checked").length >= maxSelection) {
-                            $(".lecture-checkbox:not(:checked):not(#lecture-0)").prop("disabled", true);
-                        } else {
-                            $(".lecture-checkbox").prop("disabled", false);
-                            $("#lecture-0").prop("disabled", true);
-                        }
-                    });
+                switch (selectionType) {
+                    case "free":
+                        maxSelection = 1; // 第1回のみ
+                        break;
+                    case "3":
+                        maxSelection = 4; // 第1回 + 他3コマ
+                        break;
+                    case "5":
+                        maxSelection = 6; // 第1回 + 他5コマ
+                        break;
+                    case "10":
+                        maxSelection = 11; // 第1回 + 他10コマ
+                        break;
+                    case "20":
+                        maxSelection = 21; // 第1回 + 他20コマ
+                        break;
+                    default:
+                        maxSelection = 0;
                 }
+
+                $(".lecture-checkbox").prop("checked", false).prop("disabled", false); // 初期化
+
+                // 第1回目を固定選択
+                $("#lecture-0").prop("checked", true).prop("disabled", true);
+
+                // 残り選択可能コマ数の制御
+                $(".lecture-checkbox").on("change", function () {
+                    if ($(".lecture-checkbox:checked").length >= maxSelection) {
+                        $(".lecture-checkbox:not(:checked)").prop("disabled", true);
+                    } else {
+                        $(".lecture-checkbox").prop("disabled", false);
+                        $("#lecture-0").prop("disabled", true); // 第1回目は常に固定
+                    }
+                });
             });
 
             // LIFF 初期化とプロフィール取得
@@ -134,7 +151,7 @@
                     return $(this).val();
                 }).get();
 
-                const msg = `#講座申込フォーム\n名前: ${name}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;
+                const msg = `#中学受験ニガテ克服/講座申込フォーム\n名前: ${name}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;
 
                 if (liff.isInClient()) {
                     liff.sendMessages([{ type: 'text', text: msg }])
