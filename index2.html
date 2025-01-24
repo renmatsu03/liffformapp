@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>#新中学生講座/申込フォーム</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <style>
+        input[type="submit"] {
+            display: block;
+            width: 50%;
+            margin: 20px auto;
+            padding: 15px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <form class="w-75 mx-auto mt-5">
+        <!-- 名前 -->
+        <p class="mt-3">名前</p>
+        <div>
+            <input class="form-control w-100 mt-1" name="name" placeholder="LINE名を取得中..." required>
+        </div>
+
+        <!-- 講座の購入コマ数 -->
+        <p class="mt-3">講座の購入コマ数</p>
+        <div>
+            <select class="form-control w-100 mt-1" id="koma-select" required>
+                <option value="" disabled selected>選択してください</option>
+                <option value="free">★第1回分無料</option>
+                <option value="1">1コマ ★第1回講座無料</option>
+                <option value="3">3コマ ★第1回講座無料</option>
+                <option value="5">5コマ ★第1回講座無料</option>
+                <option value="10">10コマ ★第1回講座無料</option>
+            </select>
+        </div>
+
+        <!-- 講座選択 -->
+        <p class="mt-3">講座選択</p>
+        <div id="lecture-options" class="form-group">
+            <!-- 講座リストを動的に生成 -->
+        </div>
+
+        <input type="submit" class="mt-4 btn btn-primary" value="送信" disabled>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+    <script>
+        $(document).ready(function () {
+            const liffId = "2006792721-3gajN1ll"; // LIFF ID
+            const lectures = [
+                "第1回：3/27（木） 9:00～10:00<br>数学 　正負の数　（概念と加減）",
+                "第2回：3/28（金） 9:00～10:00<br>英語　基本的な読み書き、簡単な挨拶表現",
+                "第3回：3/29（土） 9:00～10:00<br>数学　正負の数（乗除法、指数）",
+                "第4回：3/30（日） 9:00～10:00<br>英語　be動詞（肯定文、否定文）",
+                "第5回：3/31（月） 9:00～10:00<br>数学　文字と式（基本計算、小数・分数の操作を含む）",
+                "第6回：4/1（火） 9:00～10:00<br>英語　be動詞（疑問文＋会話例）",
+                "第7回：4/2（水） 9:00～10:00<br>数学　一次方程式、比例式（基礎）",
+                "第8回：4/3（木） 9:00～10:00<br>英語　一般動詞 (He Sheなどを使った文) ",
+                "第9回：4/4（金） 9:00～10:00<br>数学　一次方程式（応用：小数/分数を含む）",
+                "第10回：4/5（土） 9:00～10:00<br>英語　単語の覚え方＋学習の進め方",
+            ];
+
+            // 講座一覧を生成
+            lectures.forEach((lecture, index) => {
+                const checkbox = `
+                    <div class="form-check">
+                        <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}">
+                        <label class="form-check-label" for="lecture-${index}">${lecture}</label>
+                    </div>`;
+                $("#lecture-options").append(checkbox);
+            });
+
+            const updateSubmitButtonState = () => {
+                const selectedKoma = $("#koma-select").val();
+                const checkedCount = $(".lecture-checkbox:checked").length;
+                const maxSelection = selectedKoma === "free" ? 1 : parseInt(selectedKoma) + 1;
+
+                if (checkedCount === maxSelection) {
+                    $("input[type='submit']").prop("disabled", false);
+                } else {
+                    $("input[type='submit']").prop("disabled", true);
+                }
+            };
+
+            // コマ数に応じた選択制御
+            $("#koma-select").change(function () {
+                const selectionType = $(this).val();
+                const maxSelection = selectionType === "free" ? 1 : parseInt(selectionType) + 1; // トータル選択可能コマ数
+
+                $(".lecture-checkbox").prop("checked", false).prop("disabled", false); // 初期化
+
+                if (selectionType === "free") {
+                    $(".lecture-checkbox").prop("checked", false).prop("disabled", true);
+                    $("#lecture-0").prop("checked", true).prop("disabled", true);
+                } else {
+                    // 第1回目を固定選択
+                    $("#lecture-0").prop("checked", true).prop("disabled", true);
+                }
+
+                // 講座チェックボックスの変更時の挙動を設定
+                $(".lecture-checkbox").off("change").on("change", function () {
+                    if ($(".lecture-checkbox:checked").length >= maxSelection) {
+                        $(".lecture-checkbox:not(:checked)").prop("disabled", true);
+                    } else {
+                        $(".lecture-checkbox").prop("disabled", false);
+                        $("#lecture-0").prop("disabled", true); // 第1回目は常に固定
+                    }
+                    updateSubmitButtonState();
+                });
+
+                updateSubmitButtonState(); // 初期状態を更新
+            });
+
+            // LIFF 初期化とプロフィール取得
+            liff.init({ liffId: liffId })
+                .then(() => {
+                    if (liff.isLoggedIn()) {
+                        liff.getProfile().then(profile => {
+                            const userName = profile.displayName;
+                            $('input[name="name"]').val(userName);
+                        });
+                    } else {
+                        liff.login();
+                    }
+                });
+
+            // フォーム送信処理
+            $("form").submit(function () {
+                const name = $('input[name="name"]').val();
+                const grade = $('select[name="grade"]').val();
+                const selectedKoma = $('#koma-select').val();
+                const selectedLectures = $(".lecture-checkbox:checked").map(function () {
+                    return $(this).val();
+                }).get();
+
+                const msg = `#講座申込フォーム\n名前: ${name}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;
+
+                if (liff.isInClient()) {
+                    liff.sendMessages([{ type: 'text', text: msg }])
+                        .then(() => {
+                            alert("メッセージが送信されました");
+                            liff.closeWindow();
+                        })
+                        .catch(error => console.error("メッセージ送信失敗:", error));
+                } else {
+                    alert("LINE アプリ内で実行してください");
+                }
+                return false;
+            });
+        });
+    </script>
+</body>
+</html>
