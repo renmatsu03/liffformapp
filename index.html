@@ -19,12 +19,12 @@
         <div>
             <select class="form-control w-100 mt-1" name="grade" required>
                 <option value="" disabled selected>選択してください</option>
-                <option>小学1年</option>
-                <option>小学2年</option>
-                <option>小学3年</option>
-                <option>小学4年</option>
-                <option>小学5年</option>
                 <option>小学6年</option>
+                <option>小学5年</option>
+                <option>小学4年</option>
+                <option>小学3年</option>
+                <option>小学2年</option>
+                <option>小学1年</option>
             </select>
         </div>
 
@@ -48,7 +48,7 @@
             <!-- 講座リストを動的に生成 -->
         </div>
 
-        <input type="submit" class="mt-4 btn btn-primary" value="送信">
+        <input type="submit" class="mt-4 btn btn-primary" value="送信" disabled>
     </form>
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -92,31 +92,7 @@
             // コマ数に応じた選択制御
             $("#koma-select").change(function () {
                 const selectionType = $(this).val();
-                let maxSelection;
-
-                // トータル選択可能コマ数を設定
-                switch (selectionType) {
-                    case "free":
-                        maxSelection = 1; // 第1回固定のみ
-                        break;
-                    case "1":
-                        maxSelection = 2; // 第1回 + 1コマ
-                        break;
-                    case "3":
-                        maxSelection = 4; // 第1回 + 3コマ
-                        break;
-                    case "5":
-                        maxSelection = 6; // 第1回 + 5コマ
-                        break;
-                    case "10":
-                        maxSelection = 11; // 第1回 + 10コマ
-                        break;
-                    case "20":
-                        maxSelection = 21; // 第1回 + 20コマ
-                        break;
-                    default:
-                        maxSelection = 0;
-                }
+                const maxSelection = selectionType === "free" ? 1 : parseInt(selectionType) + 1; // トータル選択可能コマ数
 
                 $(".lecture-checkbox").prop("checked", false).prop("disabled", false); // 初期化
 
@@ -125,11 +101,19 @@
 
                 // 残り選択可能コマ数の制御
                 $(".lecture-checkbox").on("change", function () {
-                    if ($(".lecture-checkbox:checked").length >= maxSelection) {
+                    const selectedCount = $(".lecture-checkbox:checked").length;
+                    if (selectedCount >= maxSelection) {
                         $(".lecture-checkbox:not(:checked)").prop("disabled", true);
                     } else {
                         $(".lecture-checkbox").prop("disabled", false);
                         $("#lecture-0").prop("disabled", true); // 第1回目は常に固定
+                    }
+
+                    // 送信ボタンの制御
+                    if (selectedCount === maxSelection) {
+                        $("input[type='submit']").prop("disabled", false);
+                    } else {
+                        $("input[type='submit']").prop("disabled", true);
                     }
                 });
             });
@@ -174,5 +158,3 @@
     </script>
 </body>
 </html>
-
-
