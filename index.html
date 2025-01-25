@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>#講座申込フォーム</title>
+    <title>#中学受験ニガテ克服講座-申込フォーム</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <style>
         input[type="submit"] {
@@ -43,10 +43,11 @@
             <select class="form-control w-100 mt-1" id="koma-select" required>
                 <option value="" disabled selected>選択してください</option>
                 <option value="free">★第1回分無料</option>
-                <option value="3">3コマ</option>
-                <option value="5">5コマ</option>
-                <option value="10">10コマ</option>
-                <option value="20">20コマ</option>
+                <option value="1">1コマ ★第1回分無料</option>
+                <option value="3">3コマ ★第1回分無料</option>
+                <option value="5">5コマ ★第1回分無料</option>
+                <option value="10">10コマ ★第1回分無料</option>
+                <option value="20">20コマ ★第1回分無料</option>
             </select>
         </div>
 
@@ -162,7 +163,7 @@
                     return $(this).val();
                 }).get();
 
-                const msg = `#講座申込フォーム\n名前: ${name}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;
+                const msg = `#中学受験ニガテ克服講座-申込フォーム\n名前: ${name}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;
 
                 if (liff.isInClient()) {
                     liff.sendMessages([{ type: 'text', text: msg }])
