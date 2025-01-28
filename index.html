@@ -88,7 +88,6 @@
                 "第20回：7/6（日） 9:00～10:00<br>総まとめ演習"
             ];
 
-            // 講座一覧を生成
             lectures.forEach((lecture, index) => {
                 const checkbox = `
                     <div class="form-check">
@@ -110,38 +109,34 @@
                 }
             };
 
-            // コマ数に応じた選択制御
             $("#koma-select").change(function () {
                 const selectionType = $(this).val();
-                const maxSelection = selectionType === "free" ? 1 : (selectionType === "20" ? 20 : parseInt(selectionType) + 1); // トータル選択可能コマ数
+                const maxSelection = selectionType === "free" ? 1 : (selectionType === "20" ? 20 : parseInt(selectionType) + 1);
 
-                $(".lecture-checkbox").prop("checked", false).prop("disabled", false); // 初期化
+                $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
 
                 if (selectionType === "free") {
                     $(".lecture-checkbox").prop("checked", false).prop("disabled", true);
                     $("#lecture-0").prop("checked", true).prop("disabled", true);
                 } else if (selectionType === "20") {
-                    $(".lecture-checkbox").prop("checked", true).prop("disabled", true); // すべて選択
+                    $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
                 } else {
-                    // 第1回目を固定選択
                     $("#lecture-0").prop("checked", true).prop("disabled", true);
                 }
 
-                // 講座チェックボックスの変更時の挙動を設定
                 $(".lecture-checkbox").off("change").on("change", function () {
                     if ($(".lecture-checkbox:checked").length >= maxSelection) {
                         $(".lecture-checkbox:not(:checked)").prop("disabled", true);
                     } else {
                         $(".lecture-checkbox").prop("disabled", false);
-                        $("#lecture-0").prop("disabled", true); // 第1回目は常に固定
+                        $("#lecture-0").prop("disabled", true);
                     }
                     updateSubmitButtonState();
                 });
 
-                updateSubmitButtonState(); // 初期状態を更新
+                updateSubmitButtonState();
             });
 
-            // LIFF 初期化とプロフィール取得
             liff.init({ liffId: liffId })
                 .then(() => {
                     if (liff.isLoggedIn()) {
@@ -154,7 +149,6 @@
                     }
                 });
 
-            // フォーム送信処理
             $("form").submit(function () {
                 const name = $('input[name="name"]').val();
                 const grade = $('select[name="grade"]').val();
@@ -181,4 +175,3 @@
     </script>
 </body>
 </html>
-
