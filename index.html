@@ -29,14 +29,14 @@
         <input class="form-control w-100 mt-1" name="line-name" placeholder="LINE名を取得中..." readonly>
 
         <!-- 漢字氏名 -->
-        <p class="mt-3">お名前（漢字）</p>
+        <p class="mt-3">生徒様のお名前（漢字）</p>
         <div class="name-row">
             <input class="form-control" name="last-name" placeholder="姓" required>
             <input class="form-control" name="first-name" placeholder="名" required>
         </div>
 
         <!-- ふりがな -->
-        <p class="mt-3">ふりがな</p>
+        <p class="mt-3">生徒様のふりがな</p>
         <div class="furigana-row">
             <input class="form-control" name="last-name-kana" placeholder="せい" required>
             <input class="form-control" name="first-name-kana" placeholder="めい" required>
@@ -168,8 +168,7 @@
                     return $(this).val();
                 }).get();
 
-                const msg = `#中学受験ニガテ克服講座-申込フォーム\n名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma}\n選択した講座:\n${selectedLectures.join("\n")}`;
-
+                const msg = `#中学受験ニガテ克服講座-申込フォーム\n名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;                
                 liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
                     alert("メッセージが送信されました");
                     liff.closeWindow();
