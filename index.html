@@ -61,6 +61,19 @@
             <option>いいえ（2回目以降）</option>
         </select>
 
+        <p class="mt-3">Teachで生徒登録をしていますか？</p>
+            <select class="form-control w-100 mt-1" name="teach-register" id="teach-register" required>
+            <option value="" disabled selected>選択してください</option>
+            <option value="yes">はい</option>
+            <option value="no">いいえ</option>
+            </select>
+
+        
+        <div id="teach-nickname" class="mt-3" style="display: none;">
+            <p>Teachで登録しているニックネーム</p>
+            <input class="form-control" name="teach-nickname" placeholder="ニックネームを入力">
+        </div>
+
         <!-- コマ数選択 -->
         <p class="mt-3">講座の購入コマ数</p>
         <select class="form-control w-100 mt-1" id="koma-select" required>
@@ -107,18 +120,6 @@
                "第19回：6/29（日） 9:00～10:00 ~立体図形　回転体~",
                "第20回：7/6（日） 9:00～10:00 ~場合の数~"
            ];
-
-            function renderLectureOptions() {
-                $("#lecture-options").empty();
-                lectures.forEach((lecture, index) => {
-                    $("#lecture-options").append(`
-                        <div class="form-check">
-                            <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}">
-                            <label class="form-check-label" for="lecture-${index}">${lecture}</label>
-                        </div>
-                    `);
-                });
-            }
 
              // コマ選択時の制御
               lectures.forEach((lecture, index) => {
@@ -195,11 +196,11 @@
                 }).get();
                 const lineName = $('input[name="line-name"]').val();
                 const msg = `#中学受験ニガテ克服講座-申込フォーム
-LINE名: ${lineName}
-生徒様のお名前: ${name}
-学年: ${grade}
-購入コマ数: ${selectedKoma}
-選択した講座:\n${selectedLectures.join("\n")}`;
+                LINE名: ${lineName}
+                生徒様のお名前: ${name}
+                学年: ${grade}
+                購入コマ数: ${selectedKoma}
+                選択した講座:\n${selectedLectures.join("\n")}`;
 
                 liff.sendMessages([{ type: 'text', text: msg }])
                     .then(() => {
