@@ -67,7 +67,6 @@
             <option value="yes">はい</option>
             <option value="no">いいえ</option>
             </select>
-
         
         <div id="teach-nickname" class="mt-3" style="display: none;">
             <p>Teachで登録しているニックネーム</p>
@@ -86,9 +85,11 @@
             <option value="20">20コマ ★第1回分無料</option>
         </select>
 
-        <!-- 講座選択 -->
-        <p class="mt-3">受講する講座を選択してください<br>※後で変更も可能です</p>
-        <div id="lecture-options" class="form-group"></div>
+                <!-- 講座選択 -->
+        <p class="mt-3">講座選択</p>
+        <div id="lecture-options" class="form-group">
+            <!-- 講座リストを動的に生成 -->
+        </div>
 
         <input type="submit" class="mt-4 btn btn-primary" value="送信" disabled>
     </form>
