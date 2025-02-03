@@ -177,7 +177,25 @@
                 const selectedKoma = $('#koma-select').val();
                 const selectedLectures = $(".lecture-checkbox:checked").map(function () {
                     return $(this).val();
+                const teachRegister = $('select[name="teach-register"]').val();
+                const teachNickname = $('input[name="teach-nickname"]').val();
+                const firstTime = $('select[name="first-time"]').val();
+                const lineName = $('input[name="line-name"]').val();
                 }).get();
+                
+                let msg = `#中学受験ニガテ克服講座-申込フォーム
+                LINE名: ${lineName}
+                生徒様のお名前: ${name}
+                ふりがな: ${nameKana}
+                学年: ${grade}
+                今回のお申し込み: ${firstTime}
+                購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}
+                選択した講座:\n${selectedLectures.join("\n")}
+                Teachでの生徒登録: ${teachRegister}`;
+                
+                if (teachRegister === "yes") {
+                    msg += `\nTeachのニックネーム: ${teachNickname}`;
+                }
 
                 const msg = `#中学受験ニガテ克服講座-申込フォーム\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;                
                 liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
