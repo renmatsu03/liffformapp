@@ -121,6 +121,23 @@
             }
 
              // コマ選択時の制御
+              lectures.forEach((lecture, index) => {
+                $("#lecture-options").append(
+                    <div class="form-check">
+                        <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}">
+                        <label class="form-check-label" for="lecture-${index}">${lecture}</label>
+                    </div>
+                );
+            });
+
+            const updateSubmitButtonState = () => {
+                const selectedKoma = $("#koma-select").val();
+                const checkedCount = $(".lecture-checkbox:checked").length;
+                const maxSelection = selectedKoma === "free" ? 1 : parseInt(selectedKoma) + 1;
+
+                $("input[type='submit']").prop("disabled", checkedCount !== maxSelection && selectedKoma !== "20");
+            };
+
             $("#koma-select").change(function () {
                 const selectionType = $(this).val();
                 const maxSelection = selectionType === "free" ? 1 : (selectionType === "20" ? 20 : parseInt(selectionType) + 1);
@@ -128,7 +145,7 @@
                 $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
 
                 if (selectionType === "free") {
-                    $(".lecture-checkbox").prop("disabled", true);
+                    $(".lecture-checkbox").prop("checked", false).prop("disabled", true);
                     $("#lecture-0").prop("checked", true).prop("disabled", true);
                 } else if (selectionType === "20") {
                     $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
@@ -143,10 +160,8 @@
                         $(".lecture-checkbox").prop("disabled", false);
                         $("#lecture-0").prop("disabled", true);
                     }
+                    updateSubmitButtonState();
                 });
-
-                updateSubmitButtonState();
-            });
 
             function updateSubmitButtonState() {
                 const selectedKoma = $("#koma-select").val();
