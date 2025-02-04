@@ -105,13 +105,13 @@
 
 
             lectures.forEach((lecture, index) => {
-                $("#lecture-options").append(
-                    <div class="form-check">
-                        <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}">
-                        <label class="form-check-label" for="lecture-${index}">${lecture}</label>
-                    </div>
-                );
-            });
+            $("#lecture-options").append(`
+                <div class="form-check">
+                    <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}">
+                    <label class="form-check-label" for="lecture-${index}">${lecture}</label>
+                </div>
+            `);
+        });
 
             const updateSubmitButtonState = () => {
                 const selectedKoma = $("#koma-select").val();
@@ -149,18 +149,24 @@
                 updateSubmitButtonState();
             });
 
-            liff.init({ liffId: liffId })
-                .then(() => {
-                    if (liff.isLoggedIn()) {
-                        liff.getProfile().then(profile => {
-                            $('input[name="line-name"]').val(profile.displayName);
-                        });
-                    } else {
-                        liff.login();
-                    }
-                });
+             async function initializeLiff() {
+            try {
+                await liff.init({ liffId });
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                } else {
+                    const profile = await liff.getProfile();
+                    $('input[name="line-name"]').val(profile.displayName);
+                }
+            } catch (error) {
+                console.error("LIFF 初期化エラー:", error);
+            }
+        }
 
-            $("form").submit(function () {
+        initializeLiff();
+    });
+            
+        $("form").submit(function () {
                 const name = ${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()};
                 const nameKana = ${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()};
                 const grade = $('select[name="grade"]').val();
