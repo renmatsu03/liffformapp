@@ -6,13 +6,6 @@
     <title>#中学受験ニガテ克服講座-申込フォーム</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <style>
-        .name-row, .furigana-row {
-            display: flex;
-            gap: 10px;
-        }
-        .name-row input, .furigana-row input {
-            flex: 1;
-        }
         input[type="submit"] {
             display: block;
             width: 50%;
@@ -23,51 +16,29 @@
     </style>
 </head>
 <body>
-        <form class="w-75 mx-auto mt-5">
-        <!-- LINE名 -->
-            <p class="mt-3">LINE名</p>
-            <input class="form-control w-100 mt-1" name="line-name" placeholder="LINE名を取得中..." readonly>
-
-        <!-- 漢字氏名 -->
-        <p class="mt-3">生徒様のお名前（漢字）</p>
-        <div class="name-row">
-            <input class="form-control" name="last-name" placeholder="姓" required>
-            <input class="form-control" name="first-name" placeholder="名" required>
+    <form class="w-75 mx-auto mt-5">
+        <!-- 名前 -->
+        <p class="mt-3">名前</p>
+        <div>
+            <input class="form-control w-100 mt-1" name="name" placeholder="LINE名を取得中..." required>
         </div>
-
-        <!-- ふりがな -->
-        <p class="mt-3">生徒様のお名前（ふりがな）</p>
-        <div class="furigana-row">
-            <input class="form-control" name="last-name-kana" placeholder="せい" required>
-            <input class="form-control" name="first-name-kana" placeholder="めい" required>
-        </div>
-
-        <!-- 学年 -->
-        <p class="mt-3">現在の学年</p>
-        <select class="form-control w-100 mt-1" name="grade" required>
-            <option value="" disabled selected>選択してください</option>
-            <option>小学6年</option>
-            <option>小学5年</option>
-            <option>小学4年</option>
-            <option>小学3年</option>
-            <option>小学2年</option>
-            <option>小学1年</option>
-        </select>
 
         <!-- 講座の購入コマ数 -->
         <p class="mt-3">講座の購入コマ数</p>
-        <select class="form-control w-100 mt-1" id="koma-select" required>
-            <option value="" disabled selected>選択してください</option>
-            <option value="free">★第1回分無料</option>
-            <option value="1">1コマ ★第1回分無料</option>
-            <option value="3">3コマ ★第1回分無料</option>
-            <option value="5">5コマ ★第1回分無料</option>
-            <option value="10">10コマ ★第1回分無料</option>
-            <option value="20">20コマ ★第1回分無料</option>
-        </select>
+        <div>
+            <select class="form-control w-100 mt-1" id="koma-select" required>
+                <option value="" disabled selected>選択してください</option>
+                <option value="free">★第1回分無料</option>
+                <option value="1">1コマ ★第1回講座無料</option>
+                <option value="3">3コマ ★第1回講座無料</option>
+                <option value="5">5コマ ★第1回講座無料</option>
+                <option value="10">10コマ ★第1回講座無料</option>
+                <option value="20">20コマ ★第1回講座無料</option>
+            </select>
+        </div>
 
         <!-- 講座選択 -->
-        <p class="mt-3">参加される講座を選択してください</p>
+        <p class="mt-3">講座選択</p>
         <div id="lecture-options" class="form-group">
             <!-- 講座リストを動的に生成 -->
         </div>
@@ -104,84 +75,94 @@
             ];
 
 
+            // 講座一覧を生成
             lectures.forEach((lecture, index) => {
-            $("#lecture-options").append(`
-                <div class="form-check">
-                    <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}">
-                    <label class="form-check-label" for="lecture-${index}">${lecture}</label>
-                </div>
-            `);
-        });
+                const checkbox = `
+                    <div class="form-check">
+                        <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}">
+                        <label class="form-check-label" for="lecture-${index}">${lecture}</label>
+                    </div>`;
+                $("#lecture-options").append(checkbox);
+            });
 
             const updateSubmitButtonState = () => {
                 const selectedKoma = $("#koma-select").val();
                 const checkedCount = $(".lecture-checkbox:checked").length;
                 const maxSelection = selectedKoma === "free" ? 1 : parseInt(selectedKoma) + 1;
 
-                $("input[type='submit']").prop("disabled", checkedCount !== maxSelection && selectedKoma !== "20");
+                if (checkedCount === maxSelection) {
+                    $("input[type='submit']").prop("disabled", false);
+                } else {
+                    $("input[type='submit']").prop("disabled", true);
+                }
             };
 
+            // コマ数に応じた選択制御
             $("#koma-select").change(function () {
                 const selectionType = $(this).val();
-                const maxSelection = selectionType === "free" ? 1 : (selectionType === "20" ? 20 : parseInt(selectionType) + 1);
+                const maxSelection = selectionType === "free" ? 1 : parseInt(selectionType) + 1; // トータル選択可能コマ数
 
-                $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
+                $(".lecture-checkbox").prop("checked", false).prop("disabled", false); // 初期化
 
                 if (selectionType === "free") {
                     $(".lecture-checkbox").prop("checked", false).prop("disabled", true);
                     $("#lecture-0").prop("checked", true).prop("disabled", true);
-                } else if (selectionType === "20") {
-                    $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
                 } else {
+                    // 第1回目を固定選択
                     $("#lecture-0").prop("checked", true).prop("disabled", true);
                 }
 
+                // 講座チェックボックスの変更時の挙動を設定
                 $(".lecture-checkbox").off("change").on("change", function () {
                     if ($(".lecture-checkbox:checked").length >= maxSelection) {
                         $(".lecture-checkbox:not(:checked)").prop("disabled", true);
                     } else {
                         $(".lecture-checkbox").prop("disabled", false);
-                        $("#lecture-0").prop("disabled", true);
+                        $("#lecture-0").prop("disabled", true); // 第1回目は常に固定
                     }
                     updateSubmitButtonState();
                 });
 
-                updateSubmitButtonState();
+                updateSubmitButtonState(); // 初期状態を更新
             });
 
-            liff.init({ liffId })
+            // LIFF 初期化とプロフィール取得
+            liff.init({ liffId: liffId })
                 .then(() => {
                     if (liff.isLoggedIn()) {
-                        return liff.getProfile();
+                        liff.getProfile().then(profile => {
+                            const userName = profile.displayName;
+                            $('input[name="name"]').val(userName);
+                        });
                     } else {
                         liff.login();
                     }
-                })
-                .then(profile => {
-                    $('input[name="line-name"]').val(profile.displayName);
                 });
-            
-            
-        $("form").submit(function (event) {
-    event.preventDefault(); // デフォルトの送信を防ぐ
 
-    const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
-    const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
-    const grade = $('select[name="grade"]').val();
-    const selectedKoma = $('#koma-select').val();
-    const selectedLectures = $(".lecture-checkbox:checked").map(function () {
-        return $(this).val();
-    }).get();
+            // フォーム送信処理
+            $("form").submit(function () {
+                const name = $('input[name="name"]').val();
+                const grade = $('select[name="grade"]').val();
+                const selectedKoma = $('#koma-select').val();
+                const selectedLectures = $(".lecture-checkbox:checked").map(function () {
+                    return $(this).val();
+                }).get();
 
-    const msg = `#中学受験ニガテ克服講座-申込フォーム\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;
+                const msg = `#中学受験ニガテ克服講座-申込フォーム\n名前: ${name}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;
 
-    liff.sendMessages([{ type: 'text', text: msg }])
-        .then(() => {
-            alert("メッセージが送信されました");
-            liff.closeWindow();
-        })
-        .catch(err => {
-            console.error("メッセージ送信エラー:", err);
-            alert("メッセージの送信に失敗しました");
+                if (liff.isInClient()) {
+                    liff.sendMessages([{ type: 'text', text: msg }])
+                        .then(() => {
+                            alert("メッセージが送信されました");
+                            liff.closeWindow();
+                        })
+                        .catch(error => console.error("メッセージ送信失敗:", error));
+                } else {
+                    alert("LINE アプリ内で実行してください");
+                }
+                return false;
+            });
         });
-});
+    </script>
+</body>
+</html>
