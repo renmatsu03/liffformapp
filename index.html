@@ -183,13 +183,16 @@
                 });
 
             // フォーム送信処理
+            $("form").submit(function (event) {
+            event.preventDefault(); // フォーム送信を防ぐ
+
             const lineName = $('input[name="line-name"]').val();
             const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
             const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
             const grade = $('select[name="grade"]').val();
             const teachApp = $('input[name="teach-app"]:checked').val() === "yes" ? "はい" : "いいえ";
             const nickname = $('input[name="nickname"]').val() || "未登録";
-            const selectedKoma = $('select[name="koma"]').val();
+            const selectedKoma = $("#koma-select").val();
             const selectedLectures = $(".lecture-checkbox:checked").map(function () {
                 return $(this).val();
             }).get();
