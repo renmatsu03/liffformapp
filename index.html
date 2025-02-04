@@ -62,8 +62,8 @@
         </div>
 
         <!-- ニックネーム入力（Teachアプリ登録が「はい」の場合） -->
-        <div id="nickname-field" style="display: none;">
-            <p class="mt-3">ニックネームを記入してください <span class="optional">※任意</span></p>
+        <div>
+            <p class="mt-3">ニックネームを記入してください（Teachアプリ登録が「はい」の場合） <span class="optional">※任意</span></p>
             <input class="form-control" name="nickname" placeholder="ニックネーム">
         </div>
 
@@ -152,16 +152,6 @@
                 } else {
                     $("#lecture-0").prop("checked", true).prop("disabled", true);
                 }
-
-                $(".lecture-checkbox").off("change").on("change", function () {
-                    if ($(".lecture-checkbox:checked").length >= maxSelection) {
-                        $(".lecture-checkbox:not(:checked)").prop("disabled", true);
-                    } else {
-                        $(".lecture-checkbox").prop("disabled", false);
-                        $("#lecture-0").prop("disabled", true);
-                    }
-                    updateSubmitButtonState();
-                });
 
                 // 講座チェックボックスの変更時の挙動を設定
                 $(".lecture-checkbox").off("change").on("change", function () {
