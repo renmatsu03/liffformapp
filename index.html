@@ -59,11 +59,11 @@
         <select class="form-control w-100 mt-1" id="koma-select" required>
             <option value="" disabled selected>選択してください</option>
             <option value="free">★第1回分無料</option>
-            <option value="1">1コマ ★第1回分無料</option>
-            <option value="3">3コマ ★第1回分無料</option>
-            <option value="5">5コマ ★第1回分無料</option>
-            <option value="10">10コマ ★第1回分無料</option>
-            <option value="20">20コマ ★5コマ分お得！</option>
+            <option value="1">1コマ（¥1,000） ★第1回分無料</option>
+            <option value="3">3コマ（¥2,700） ★第1回分無料</option>
+            <option value="5">5コマ（¥4,250） ★第1回分無料</option>
+            <option value="10">10コマ（¥8,000） ★第1回分無料</option>
+            <option value="20">20コマ（¥15,000） ★5コマ分お得！</option>
         </select>
 
         <!-- 講座選択 -->
@@ -150,33 +150,36 @@
             });
 
             liff.init({ liffId: liffId })
-                .then(() => {
-                    if (liff.isLoggedIn()) {
-                        liff.getProfile().then(profile => {
-                            $('input[name="line-name"]').val(profile.displayName);
-                        });
-                    } else {
-                        liff.login();
-                    }
-                });
-
-            $("form").submit(function () {
-                const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
-                const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
-                const grade = $('select[name="grade"]').val();
-                const selectedKoma = $('#koma-select').val();
-                const selectedLectures = $(".lecture-checkbox:checked").map(function () {
-                    return $(this).val();
-                }).get();
-
-                const msg = `#中学受験ニガテ克服講座-申込フォーム\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;                
-                liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
-                    alert("メッセージが送信されました");
-                    liff.closeWindow();
-                });
-
-                return false;
+    .then(() => {
+        if (liff.isLoggedIn()) {
+            liff.getProfile().then(profile => {
+                $('input[name="line-name"]').val(profile.displayName);
+                window.lineName = profile.displayName; // ここでグローバル変数に保存
             });
+        } else {
+            liff.login();
+        }
+    });
+
+$("form").submit(function () {
+    const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
+    const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
+    const grade = $('select[name="grade"]').val();
+    const selectedKoma = $('#koma-select').val();
+    const selectedLectures = $(".lecture-checkbox:checked").map(function () {
+        return $(this).val();
+    }).get();
+
+    const msg = `#中学受験ニガテ克服講座-申込フォーム\nLINE名: ${window.lineName}\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;                
+
+    liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
+        alert("メッセージが送信されました");
+        liff.closeWindow();
+    });
+
+    return false;
+});
+
         });
     </script>
 </body>
