@@ -162,24 +162,26 @@
                 });
             
             
-        $("form").submit(function () {
-                const name = ${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()};
-                const nameKana = ${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()};
-                const grade = $('select[name="grade"]').val();
-                const selectedKoma = $('#koma-select').val();
-                const selectedLectures = $(".lecture-checkbox:checked").map(function () {
-                    return $(this).val();
-                }).get();
+        $("form").submit(function (event) {
+    event.preventDefault(); // デフォルトの送信を防ぐ
 
-                const msg = #中学受験ニガテ克服講座-申込フォーム\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")};                
-                liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
-                    alert("メッセージが送信されました");
-                    liff.closeWindow();
-                });
+    const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
+    const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
+    const grade = $('select[name="grade"]').val();
+    const selectedKoma = $('#koma-select').val();
+    const selectedLectures = $(".lecture-checkbox:checked").map(function () {
+        return $(this).val();
+    }).get();
 
-                return false;
-            });
+    const msg = `#中学受験ニガテ克服講座-申込フォーム\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;
+
+    liff.sendMessages([{ type: 'text', text: msg }])
+        .then(() => {
+            alert("メッセージが送信されました");
+            liff.closeWindow();
+        })
+        .catch(err => {
+            console.error("メッセージ送信エラー:", err);
+            alert("メッセージの送信に失敗しました");
         });
-    </script>
-</body>
-</html>
+});
