@@ -183,16 +183,27 @@
                 });
 
             // フォーム送信処理
-            $("form").submit(function () {
-                const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
-                const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
-                const grade = $('select[name="grade"]').val();
-                const selectedKoma = $('#koma-select').val();
-                const selectedLectures = $(".lecture-checkbox:checked").map(function () {
-                    return $(this).val();
-                }).get();
-
-                const msg = `#講座申込フォーム\n生徒様のお名前: ${name-r0w}\nふりがな: ${furigana-row}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;                
+            const lineName = $('input[name="line-name"]').val();
+            const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
+            const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
+            const grade = $('select[name="grade"]').val();
+            const teachApp = $('input[name="teach-app"]:checked').val() === "yes" ? "はい" : "いいえ";
+            const nickname = $('input[name="nickname"]').val() || "未登録";
+            const selectedKoma = $('select[name="koma"]').val();
+            const selectedLectures = $(".lecture-checkbox:checked").map(function () {
+                return $(this).val();
+            }).get();
+            
+            const msg = `#講座申込フォーム
+            LINE名: ${lineName}
+            生徒様のお名前: ${name}
+            ふりがな: ${nameKana}
+            学年: ${grade}
+            Teachアプリ登録: ${teachApp}
+            Teach登録ニックネーム: ${nickname}
+            購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}
+            選択した講座:${selectedLectures.join("\n")};
+               
                 liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
                     alert("メッセージが送信されました");
                     liff.closeWindow();
