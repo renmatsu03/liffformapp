@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>#中学受験ニガテ克服講座-申込フォーム</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <style>
+        .name-row, .furigana-row {
+            display: flex;
+            gap: 10px;
+        }
+        .name-row input, .furigana-row input {
+            flex: 1;
+        }
+        input[type="submit"] {
+            display: block;
+            width: 50%;
+            margin: 20px auto;
+            padding: 15px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <form class="w-75 mx-auto mt-5">
+        <!-- LINE名 -->
+        <p class="mt-3">LINE名</p>
+        <input class="form-control w-100 mt-1" name="line-name" placeholder="LINE名を取得中..." readonly>
+
+        <!-- 漢字氏名 -->
+        <p class="mt-3">生徒様のお名前（漢字）</p>
+        <div class="name-row">
+            <input class="form-control" name="last-name" placeholder="姓" required>
+            <input class="form-control" name="first-name" placeholder="名" required>
+        </div>
+
+        <!-- ふりがな -->
+        <p class="mt-3">生徒様のお名前（ふりがな）</p>
+        <div class="furigana-row">
+            <input class="form-control" name="last-name-kana" placeholder="せい" required>
+            <input class="form-control" name="first-name-kana" placeholder="めい" required>
+        </div>
+
+        <!-- 学年 -->
+        <p class="mt-3">現在の学年</p>
+        <select class="form-control w-100 mt-1" name="grade" required>
+            <option value="" disabled selected>選択してください</option>
+            <option>小学6年</option>
+            <option>小学5年</option>
+            <option>小学4年</option>
+            <option>小学3年</option>
+            <option>小学2年</option>
+            <option>小学1年</option>
+        </select>
+
+        <!-- 講座の購入コマ数 -->
+        <p class="mt-3">講座の購入コマ数</p>
+        <select class="form-control w-100 mt-1" id="koma-select" required>
+            <option value="" disabled selected>選択してください</option>
+            <option value="free">★第1回分無料</option>
+            <option value="1">1コマ ★第1回分無料</option>
+            <option value="3">3コマ ★第1回分無料</option>
+            <option value="5">5コマ ★第1回分無料</option>
+            <option value="10">10コマ ★第1回分無料</option>
+            <option value="20">20コマ ★第1回分無料</option>
+        </select>
+
+        <!-- 講座選択 -->
+        <p class="mt-3">参加される講座を選択してください</p>
+        <div id="lecture-options" class="form-group">
+            <!-- 講座リストを動的に生成 -->
+        </div>
+
+        <input type="submit" class="mt-4 btn btn-primary" value="送信" disabled>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+    <script>
+        $(document).ready(function () {
+            const liffId = "2006792721-3gajN1ll"; // LIFF ID
+            const lectures = [
+                "第1回：2/16（日） 9:00～10:00 ~割合と比　食塩水~",
+                "第2回：2/23（日） 9:00～10:00 ~割合と比　売買損益~",
+                "第3回：3/2（日） 9:00～10:00 ~割合と比　倍数算~",
+                "第4回：3/9（日） 9:00～10:00 ~速さ　旅人算~",
+                "第5回：3/16（日） 9:00～10:00 ~速さ　速さと比~",
+                "第6回：3/23（日） 9:00～10:00 ~速さ　ダイヤグラム~",
+                "第7回：3/30（日） 9:00～10:00 ~和差算~",
+                "第8回：4/6（日） 9:00～10:00 ~つるかめ算~",
+                "第9回：4/13（日） 9:00～10:00 ~仕事算~",
+                "第10回：4/20（日） 9:00～10:00 ~特殊算まとめ~",
+                "第11回：4/27（日） 9:00～10:00 ~平面図形　面積の比、辺の比~",
+                "第12回：5/4（日） 9:00～10:00 ~平面図形　多角形~",
+                "第13回：5/11（日） 9:00～10:00 ~平面図形　図形の移動~",
+                "第14回：5/18（日） 9:00～10:00 ~数と性質　規則性~",
+                "第15回：5/25（日） 9:00～10:00 ~数と性質　約数倍数~",
+                "第16回：6/8（日） 9:00～10:00 ~数と性質　分数や少数といった単純計算~",
+                "第17回：6/15（日） 9:00～10:00 ~立体図形　体積、表面積~",
+                "第18回：6/22（日） 9:00～10:00 ~立体図形　切断~",
+                "第19回：6/29（日） 9:00～10:00 ~立体図形　回転体~",
+                "第20回：7/6（日） 9:00～10:00 ~場合の数~"
+            ];
+
+
+            lectures.forEach((lecture, index) => {
+                $("#lecture-options").append(
+                    <div class="form-check">
+                        <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}">
+                        <label class="form-check-label" for="lecture-${index}">${lecture}</label>
+                    </div>
+                );
+            });
+
+            const updateSubmitButtonState = () => {
+                const selectedKoma = $("#koma-select").val();
+                const checkedCount = $(".lecture-checkbox:checked").length;
+                const maxSelection = selectedKoma === "free" ? 1 : parseInt(selectedKoma) + 1;
+
+                $("input[type='submit']").prop("disabled", checkedCount !== maxSelection && selectedKoma !== "20");
+            };
+
+            $("#koma-select").change(function () {
+                const selectionType = $(this).val();
+                const maxSelection = selectionType === "free" ? 1 : (selectionType === "20" ? 20 : parseInt(selectionType) + 1);
+
+                $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
+
+                if (selectionType === "free") {
+                    $(".lecture-checkbox").prop("checked", false).prop("disabled", true);
+                    $("#lecture-0").prop("checked", true).prop("disabled", true);
+                } else if (selectionType === "20") {
+                    $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
+                } else {
+                    $("#lecture-0").prop("checked", true).prop("disabled", true);
+                }
+
+                $(".lecture-checkbox").off("change").on("change", function () {
+                    if ($(".lecture-checkbox:checked").length >= maxSelection) {
+                        $(".lecture-checkbox:not(:checked)").prop("disabled", true);
+                    } else {
+                        $(".lecture-checkbox").prop("disabled", false);
+                        $("#lecture-0").prop("disabled", true);
+                    }
+                    updateSubmitButtonState();
+                });
+
+                updateSubmitButtonState();
+            });
+
+            liff.init({ liffId: liffId })
+                .then(() => {
+                    if (liff.isLoggedIn()) {
+                        liff.getProfile().then(profile => {
+                            $('input[name="line-name"]').val(profile.displayName);
+                        });
+                    } else {
+                        liff.login();
+                    }
+                });
+
+            $("form").submit(function () {
+                const name = ${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()};
+                const nameKana = ${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()};
+                const grade = $('select[name="grade"]').val();
+                const selectedKoma = $('#koma-select').val();
+                const selectedLectures = $(".lecture-checkbox:checked").map(function () {
+                    return $(this).val();
+                }).get();
+
+                const msg = #中学受験ニガテ克服講座-申込フォーム\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")};                
+                liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
+                    alert("メッセージが送信されました");
+                    liff.closeWindow();
+                });
+
+                return false;
+            });
+        });
+    </script>
+</body>
+</html>
