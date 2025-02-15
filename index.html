@@ -120,19 +120,23 @@ $("#koma-select").change(function () {
     const selectionType = $(this).val();
     const maxSelection = selectionType === "20" ? 20 : parseInt(selectionType);
 
-    // すべてのチェックボックスを無効にし、選択状態をリセット
+    // すべてのチェックボックスをリセットし、選択を解除
     $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
 
-    // 第1回を再度disabledに設定（購入コマ数に関わらず無効）
+    // 第1回を強制的にdisabledに設定
     $("#lecture-0").prop("disabled", true).prop("checked", false);
 
     if (selectionType === "20") {
+        // 20コマ選択時、すべての講座をチェック＆無効化
         $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
     } else {
+        // その他の場合、チェックボックスを再度有効に
         $(".lecture-checkbox").prop("disabled", false);
     }
 
+    // チェックボックスが変更されるたびに処理
     $(".lecture-checkbox").off("change").on("change", function () {
+        // 最大選択数に達したら他のチェックボックスを無効化
         if ($(".lecture-checkbox:checked").length >= maxSelection) {
             $(".lecture-checkbox:not(:checked)").prop("disabled", true);
         } else {
@@ -141,9 +145,6 @@ $("#koma-select").change(function () {
         updateSubmitButtonState();
     });
 
+    // 送信ボタンの状態更新
     updateSubmitButtonState();
 });
-
-
-
-
