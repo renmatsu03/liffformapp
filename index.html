@@ -102,6 +102,9 @@
             "第20回：7/6（日） 9:00～10:00<br>~場合の数~"
         ];
 
+        // 初期状態で第1回を選択不可に設定
+    $("#lecture-0").prop("disabled", true).prop("checked", false);
+
         // 講座リスト生成
         lectures.forEach((lecture, index) => {
             const isDisabled = index === 0 ? "" : "";
