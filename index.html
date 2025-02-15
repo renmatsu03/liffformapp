@@ -77,112 +77,109 @@
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
     <script>
-        $(document).ready(function () {
-            const liffId = "2006792721-3gajN1ll"; // LIFF ID
-            const lectures = [
-                "第1回：2/16（日） 9:00～10:00<br>~割合と比　食塩水~",
-                "第2回：2/23（日） 9:00～10:00<br>~割合と比　売買損益~",
-                "第3回：3/2（日） 9:00～10:00<br>~割合と比　倍数算~",
-                "第4回：3/9（日） 9:00～10:00<br>~速さ　旅人算~",
-                "第5回：3/16（日） 9:00～10:00<br>~速さ　速さと比~",
-                "第6回：3/23（日） 9:00～10:00<br>~速さ　ダイヤグラム~",
-                "第7回：3/30（日） 9:00～10:00<br>~和差算~",
-                "第8回：4/6（日） 9:00～10:00<br>~つるかめ算~",
-                "第9回：4/13（日） 9:00～10:00<br>~仕事算~",
-                "第10回：4/20（日） 9:00～10:00<br>~特殊算まとめ~",
-                "第11回：4/27（日） 9:00～10:00<br>~平面図形　面積の比、辺の比~",
-                "第12回：5/4（日） 9:00～10:00<br>~平面図形　多角形~",
-                "第13回：5/11（日） 9:00～10:00<br>~平面図形　図形の移動~",
-                "第14回：5/18（日） 9:00～10:00<br>~数と性質　規則性~",
-                "第15回：5/25（日） 9:00～10:00<br>~数と性質　約数倍数~",
-                "第16回：6/8（日） 9:00～10:00<br>~数と性質　分数や少数といった単純計算~",
-                "第17回：6/15（日） 9:00～10:00<br>~立体図形　体積、表面積~",
-                "第18回：6/22（日） 9:00～10:00<br>~立体図形　切断~",
-                "第19回：6/29（日） 9:00～10:00<br>~立体図形　回転体~",
-                "第20回：7/6（日） 9:00～10:00<br>~場合の数~"
-            ];
+    $(document).ready(function () {
+        const liffId = "2006792721-3gajN1ll"; // LIFF ID
+        const lectures = [
+            "第1回：2/16（日） 9:00～10:00<br>~割合と比　食塩水~",
+            "第2回：2/23（日） 9:00～10:00<br>~割合と比　売買損益~",
+            "第3回：3/2（日） 9:00～10:00<br>~割合と比　倍数算~",
+            "第4回：3/9（日） 9:00～10:00<br>~速さ　旅人算~",
+            "第5回：3/16（日） 9:00～10:00<br>~速さ　速さと比~",
+            "第6回：3/23（日） 9:00～10:00<br>~速さ　ダイヤグラム~",
+            "第7回：3/30（日） 9:00～10:00<br>~和差算~",
+            "第8回：4/6（日） 9:00～10:00<br>~つるかめ算~",
+            "第9回：4/13（日） 9:00～10:00<br>~仕事算~",
+            "第10回：4/20（日） 9:00～10:00<br>~特殊算まとめ~",
+            "第11回：4/27（日） 9:00～10:00<br>~平面図形　面積の比、辺の比~",
+            "第12回：5/4（日） 9:00～10:00<br>~平面図形　多角形~",
+            "第13回：5/11（日） 9:00～10:00<br>~平面図形　図形の移動~",
+            "第14回：5/18（日） 9:00～10:00<br>~数と性質　規則性~",
+            "第15回：5/25（日） 9:00～10:00<br>~数と性質　約数倍数~",
+            "第16回：6/8（日） 9:00～10:00<br>~数と性質　分数や少数といった単純計算~",
+            "第17回：6/15（日） 9:00～10:00<br>~立体図形　体積、表面積~",
+            "第18回：6/22（日） 9:00～10:00<br>~立体図形　切断~",
+            "第19回：6/29（日） 9:00～10:00<br>~立体図形　回転体~",
+            "第20回：7/6（日） 9:00～10:00<br>~場合の数~"
+        ];
 
+        // 講座リスト生成
+        lectures.forEach((lecture, index) => {
+            const isDisabled = index === 0 ? "" : "";
+            const labelStyle = index === 0 ? "style='text-decoration: line-through; color: gray;'" : "";
+            
+            $("#lecture-options").append(`
+                <div class="form-check">
+                    <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}" ${isDisabled}>
+                    <label class="form-check-label" for="lecture-${index}" ${labelStyle}>${lecture}</label>
+                </div>
+            `);
+        });
 
-            lectures.forEach((lecture, index) => {
-    const isDisabled = index === 0 ? "disabled" : "";
-    const labelStyle = index === 0 ? "style='text-decoration: line-through; color: gray;'" : "";
-    
-    $("#lecture-options").append(`
-        <div class="form-check">
-            <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}" ${isDisabled}>
-            <label class="form-check-label" for="lecture-${index}" ${labelStyle}>${lecture}</label>
-        </div>
-    `);
-});
+        const updateSubmitButtonState = () => {
+            const selectedKoma = $("#koma-select").val();
+            const checkedCount = $(".lecture-checkbox:checked").length;
+            const maxSelection = selectedKoma === "20" ? 20 : parseInt(selectedKoma);
 
-            const updateSubmitButtonState = () => {
-                const selectedKoma = $("#koma-select").val();
-                const checkedCount = $(".lecture-checkbox:checked").length;
-                const maxSelection = selectedKoma === "free" ? 1 : parseInt(selectedKoma) + 1;
+            $("input[type='submit']").prop("disabled", checkedCount !== maxSelection);
+        };
 
-                $("input[type='submit']").prop("disabled", checkedCount !== maxSelection && selectedKoma !== "20");
-            };
+        // 講座購入コマ数の変更処理
+        $("#koma-select").change(function () {
+            const selectionType = $(this).val();
+            const maxSelection = selectionType === "20" ? 20 : parseInt(selectionType);
 
-            $("#koma-select").change(function () {
-                const selectionType = $(this).val();
-                const maxSelection = selectionType === "free" ? 1 : (selectionType === "20" ? 20 : parseInt(selectionType) + 1);
+            $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
 
-                $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
+            if (selectionType === "20") {
+                $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
+            } else {
+                $(".lecture-checkbox").prop("disabled", false);
+            }
 
-                if (selectionType === "free") {
-                    $(".lecture-checkbox").prop("checked", false).prop("disabled", true);
-                    $("#lecture-0").prop("checked", true).prop("disabled", true);
-                } else if (selectionType === "20") {
-                    $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
+            $(".lecture-checkbox").off("change").on("change", function () {
+                if ($(".lecture-checkbox:checked").length >= maxSelection) {
+                    $(".lecture-checkbox:not(:checked)").prop("disabled", true);
                 } else {
-                    $("#lecture-0").prop("checked", true).prop("disabled", true);
+                    $(".lecture-checkbox").prop("disabled", false);
                 }
-
-                $(".lecture-checkbox").off("change").on("change", function () {
-                    if ($(".lecture-checkbox:checked").length >= maxSelection) {
-                        $(".lecture-checkbox:not(:checked)").prop("disabled", true);
-                    } else {
-                        $(".lecture-checkbox").prop("disabled", false);
-                        $("#lecture-0").prop("disabled", true);
-                    }
-                    updateSubmitButtonState();
-                });
-
                 updateSubmitButtonState();
             });
 
-            liff.init({ liffId: liffId })
-    .then(() => {
-        if (liff.isLoggedIn()) {
-            liff.getProfile().then(profile => {
-                $('input[name="line-name"]').val(profile.displayName);
-                window.lineName = profile.displayName; // ここでグローバル変数に保存
-            });
-        } else {
-            liff.login();
-        }
-    });
-
-$("form").submit(function () {
-    const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
-    const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
-    const grade = $('select[name="grade"]').val();
-    const selectedKoma = $('#koma-select').val();
-    const selectedLectures = $(".lecture-checkbox:checked").map(function () {
-        return $(this).val();
-    }).get();
-
-    const msg = `#中学受験ニガテ克服講座-申込フォーム\nLINE名: ${window.lineName}\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "★第1回分無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;                
-
-    liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
-        alert("メッセージが送信されました");
-        liff.closeWindow();
-    });
-
-    return false;
-});
-
+            updateSubmitButtonState();
         });
-    </script>
-</body>
-</html>
+
+        // LIFF 初期化
+        liff.init({ liffId: liffId })
+            .then(() => {
+                if (liff.isLoggedIn()) {
+                    liff.getProfile().then(profile => {
+                        $('input[name="line-name"]').val(profile.displayName);
+                        window.lineName = profile.displayName; // グローバル変数に保存
+                    });
+                } else {
+                    liff.login();
+                }
+            });
+
+        // フォーム送信処理
+        $("form").submit(function () {
+            const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
+            const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
+            const grade = $('select[name="grade"]').val();
+            const selectedKoma = $('#koma-select').val();
+            const selectedLectures = $(".lecture-checkbox:checked").map(function () {
+                return $(this).val();
+            }).get();
+
+            const msg = `#中学受験ニガテ克服講座-申込フォーム\nLINE名: ${window.lineName}\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "20" ? selectedKoma + "コマ" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;
+
+            liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
+                alert("メッセージが送信されました");
+                liff.closeWindow();
+            });
+
+            return false;
+        });
+
+    });
+</script>
