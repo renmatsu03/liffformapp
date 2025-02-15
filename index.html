@@ -124,32 +124,33 @@
     };
 
     // 講座購入コマ数の変更処理
-    $("#koma-select").change(function () {
-        const selectionType = $(this).val();
-        const maxSelection = selectionType === "20" ? 20 : parseInt(selectionType);
+$("#koma-select").change(function () {
+    const selectionType = $(this).val();
+    const maxSelection = selectionType === "20" ? 20 : parseInt(selectionType);
 
-        $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
+    $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
 
-        // 第1回を再度disabledに設定
-        $("#lecture-0").prop("disabled", true).prop("checked", false);
+    // 第1回は常に無効化
+    $("#lecture-0").prop("disabled", true).prop("checked", false);
 
-        if (selectionType === "20") {
-            $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
+    if (selectionType === "20") {
+        $(".lecture-checkbox:not(#lecture-0)").prop("checked", true).prop("disabled", true);
+    } else {
+        $(".lecture-checkbox:not(#lecture-0)").prop("disabled", false);
+    }
+
+    $(".lecture-checkbox:not(#lecture-0)").off("change").on("change", function () {
+        if ($(".lecture-checkbox:checked").length >= maxSelection) {
+            $(".lecture-checkbox:not(:checked):not(#lecture-0)").prop("disabled", true);
         } else {
-            $(".lecture-checkbox").prop("disabled", false);
+            $(".lecture-checkbox:not(#lecture-0)").prop("disabled", false);
         }
-
-        $(".lecture-checkbox").off("change").on("change", function () {
-            if ($(".lecture-checkbox:checked").length >= maxSelection) {
-                $(".lecture-checkbox:not(:checked)").prop("disabled", true);
-            } else {
-                $(".lecture-checkbox").prop("disabled", false);
-            }
-            updateSubmitButtonState();
-        });
-
         updateSubmitButtonState();
     });
+
+    updateSubmitButtonState();
+});
+
 
     // LIFF 初期化
     liff.init({ liffId: liffId })
