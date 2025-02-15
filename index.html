@@ -130,6 +130,9 @@
 
             $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
 
+            // 第1回を再度disabledに設定
+            $("#lecture-0").prop("disabled", true).prop("checked", false);
+            
             if (selectionType === "20") {
                 $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
             } else {
