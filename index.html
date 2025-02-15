@@ -128,9 +128,10 @@
         const selectionType = $(this).val();
         const maxSelection = selectionType === "20" ? 20 : parseInt(selectionType);
 
+        // チェックボックスの状態をリセット
         $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
 
-        // 第1回を再度disabledに設定
+        // 第1回を無効に設定
         $("#lecture-0").prop("disabled", true).prop("checked", false);
 
         if (selectionType === "20") {
@@ -139,6 +140,7 @@
             $(".lecture-checkbox").prop("disabled", false);
         }
 
+        // 講座数に合わせてボタンを有効/無効にする
         $(".lecture-checkbox").off("change").on("change", function () {
             if ($(".lecture-checkbox:checked").length >= maxSelection) {
                 $(".lecture-checkbox:not(:checked)").prop("disabled", true);
@@ -186,5 +188,7 @@
 
 });
 </script>
+
+        
 
 
