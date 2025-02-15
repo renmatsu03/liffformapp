@@ -105,13 +105,16 @@
 
 
             lectures.forEach((lecture, index) => {
-                $("#lecture-options").append(`
-                    <div class="form-check">
-                        <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}">
-                        <label class="form-check-label" for="lecture-${index}">${lecture}</label>
-                    </div>
-                `);
-            });
+    const isDisabled = index === 0 ? "disabled" : "";
+    const labelStyle = index === 0 ? "style='text-decoration: line-through; color: gray;'" : "";
+    
+    $("#lecture-options").append(`
+        <div class="form-check">
+            <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}" ${isDisabled}>
+            <label class="form-check-label" for="lecture-${index}" ${labelStyle}>${lecture}</label>
+        </div>
+    `);
+});
 
             const updateSubmitButtonState = () => {
                 const selectedKoma = $("#koma-select").val();
