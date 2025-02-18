@@ -144,15 +144,12 @@
     updateSubmitButtonState();
 });
 
-
             const updateSubmitButtonState = () => {
                 const selectedKoma = $("#koma-select").val();
                 const checkedCount = $(".lecture-checkbox:checked").length;
                 const maxSelection = selectedKoma === "free" ? 1 : parseInt(selectedKoma);
-                
-                $("input[type='submit']").prop("disabled", checkedCount !== maxSelection);
+            $("input[type='submit']").prop("disabled", checkedCount !== maxSelection);
             };
-
 
             // LIFF 初期化
             liff.init({ liffId: liffId })
