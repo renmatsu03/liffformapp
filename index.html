@@ -118,32 +118,32 @@
             });
 
             // コマ数選択時の処理
-            $("#koma-select").change(function () {
-                const selectedOption = $("#koma-select option:selected");
-                const selectedValue = selectedOption.val();
-                const maxSelection = selectionType === "free" ? 1 : (selectionType === "10" ? 10 : parseInt(selectionType) );
+           $("#koma-select").change(function () {
+    const selectedValue = $(this).val();
+    const maxSelection = selectedValue === "free" ? 1 : parseInt(selectedValue);
 
-                $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
-                $("#lecture-0").prop("disabled", true).prop("checked", false); // 第1回はデフォルトで無効化
+    $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
+    $("#lecture-0").prop("disabled", true).prop("checked", false); // 第1回は常に無効
 
-                if (selectedValue === "20") { // 20コマ選択時は全ての講座を自動選択（第1回も含む）
-                    $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
-                    $("#lecture-0").prop("checked", true).prop("disabled", true); // 第1回も自動でチェック
-                } else {
-                    $(".lecture-checkbox:not(#lecture-0)").prop("disabled", false);
-                }
+    if (selectedValue === "20") {
+        $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
+        $("#lecture-0").prop("checked", true).prop("disabled", true);
+    } else {
+        $(".lecture-checkbox:not(#lecture-0)").prop("disabled", false);
+    }
 
-                $(".lecture-checkbox:not(#lecture-0)").off("change").on("change", function () {
-                    if ($(".lecture-checkbox:checked").length >= maxSelection) {
-                        $(".lecture-checkbox:not(:checked):not(#lecture-0)").prop("disabled", true);
-                    } else {
-                        $(".lecture-checkbox:not(#lecture-0)").prop("disabled", false);
-                    }
-                    updateSubmitButtonState();
-                });
+    $(".lecture-checkbox:not(#lecture-0)").off("change").on("change", function () {
+        if ($(".lecture-checkbox:checked").length >= maxSelection) {
+            $(".lecture-checkbox:not(:checked):not(#lecture-0)").prop("disabled", true);
+        } else {
+            $(".lecture-checkbox:not(#lecture-0)").prop("disabled", false);
+        }
+        updateSubmitButtonState();
+    });
 
-                updateSubmitButtonState();
-            });
+    updateSubmitButtonState();
+});
+
 
             const updateSubmitButtonState = () => {
                 const selectedKoma = $("#koma-select").val();
