@@ -168,11 +168,13 @@
                 });
 
             // フォーム送信処理
-            $("form").submit(function () {
-                const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
-                const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
-                const grade = $('select[name="grade"]').val();
-                const selectedKoma = $('#koma-select').val();
+            $("form").submit(function (event) {
+    event.preventDefault();  // フォーム送信によるページリロード防止
+
+    const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
+    const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
+    const grade = $('select[name="grade"]').val();
+    const selectedKoma = $('#koma-select').val();
 
     // ここを修正後のコードに置き換え
     const selectedOption = $("#koma-select option:selected");
@@ -187,16 +189,16 @@
         return $(this).val();
     }).get();
 
+    const msg = `#中学受験ニガテ克服講座-申込フォーム\nLINE名: ${$('input[name="line-name"]').val()}\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma}コマ\n選択した講座:\n${selectedLectures.join("\n")}`;
 
-                const msg = `#中学受験ニガテ克服講座-申込フォーム\nLINE名: ${$('input[name="line-name"]').val()}\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma}コマ\n選択した講座:\n${selectedLectures.join("\n")}`;
+    liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
+        alert("メッセージが送信されました");
+        liff.closeWindow();
+    });
 
-                liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
-                    alert("メッセージが送信されました");
-                    liff.closeWindow();
-                });
+    return false;  // ページリロード防止
+});
 
-                return false;
-            });
         });
     </script>
 </body>
