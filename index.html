@@ -123,14 +123,6 @@
             const selectedOption = $("#koma-select option:selected");
             const selectedValue = selectedOption.val();
             const selectedType = selectedOption.data("type");
-
-            if (selectedType === "free") {
-                if (hasUsedFreeTrial) {
-                    alert("初回無料は1度のみ選択できます。");
-                    $(this).val("");
-                    return;
-                }
-                hasUsedFreeTrial = true;
             }
 
             const maxSelection = selectedValue === "20" ? 20 : parseInt(selectedValue);
