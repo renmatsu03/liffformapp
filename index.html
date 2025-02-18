@@ -173,6 +173,15 @@
                 const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
                 const grade = $('select[name="grade"]').val();
                 const selectedKoma = $('#koma-select').val();
+
+                const selectedType = selectedOption.data("type");
+                
+                // メッセージ用のコマ数表記
+                let komaMessage = `購入コマ数: ${selectedKoma}コマ`;
+                if (selectedType === "free") {
+                    komaMessage = `購入コマ数: 無料1コマ`;
+                }
+                
                 const selectedLectures = $(".lecture-checkbox:checked").map(function () {
                     return $(this).val();
                 }).get();
@@ -190,4 +199,3 @@
     </script>
 </body>
 </html>
-
