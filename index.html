@@ -58,8 +58,8 @@
         <p class="mt-3">講座の購入コマ数</p>
         <select class="form-control w-100 mt-1" id="koma-select" name="koma" required>
             <option value="" disabled selected>選択してください</option>
-            <option value="1" data-type="free">無料1コマ（★初回特典）</option>
-            <option value="1" data-type="paid">1コマ（¥1,000）</option>
+            <option value="free">無料1コマ（★初回特典）</option>
+            <option value="1">1コマ（¥1,000）</option>
             <option value="3">3コマ（¥2,700）★300円お得！</option>
             <option value="5">5コマ（¥4,250）★750円お得！</option>
             <option value="10">10コマ（¥8,000）★2コマ分お得！</option>
@@ -189,7 +189,7 @@
         return $(this).val();
     }).get();
 
-    const msg = `#中学受験ニガテ克服講座-申込フォーム\nLINE名: ${$('input[name="line-name"]').val()}\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma}コマ\n選択した講座:\n${selectedLectures.join("\n")}`;
+    const msg = `#中学受験ニガテ克服講座-申込フォーム\nLINE名: ${$('input[name="line-name"]').val()}\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "初回無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;
 
     liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
         alert("メッセージが送信されました");
