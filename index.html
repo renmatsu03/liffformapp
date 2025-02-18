@@ -174,22 +174,19 @@
                 const grade = $('select[name="grade"]').val();
                 const selectedKoma = $('#koma-select').val();
 
-                const selectedType = selectedOption.data("type");
-                
-                // メッセージ用のコマ数表記
-                let komaMessage = `購入コマ数: ${selectedKoma}コマ`;
-                
-                // selectedTypeがundefinedの場合の処理を追加
-                const selectedOption = $("#koma-select option:selected");
-                const selectedType = selectedOption.data("type");
-                
-                if (selectedType && selectedType === "free") {
-                    komaMessage = `購入コマ数: 無料1コマ`;
-                }
+    // ここを修正後のコードに置き換え
+    const selectedOption = $("#koma-select option:selected");
+    const selectedType = selectedOption.data("type");
 
-                const selectedLectures = $(".lecture-checkbox:checked").map(function () {
-                    return $(this).val();
-                }).get();
+    let komaMessage = `購入コマ数: ${selectedKoma}コマ`;
+    if (selectedType && selectedType === "free") {
+        komaMessage = `購入コマ数: 無料1コマ`;
+    }
+
+    const selectedLectures = $(".lecture-checkbox:checked").map(function () {
+        return $(this).val();
+    }).get();
+
 
                 const msg = `#中学受験ニガテ克服講座-申込フォーム\nLINE名: ${$('input[name="line-name"]').val()}\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma}コマ\n選択した講座:\n${selectedLectures.join("\n")}`;
 
