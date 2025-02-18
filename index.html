@@ -178,10 +178,15 @@
                 
                 // メッセージ用のコマ数表記
                 let komaMessage = `購入コマ数: ${selectedKoma}コマ`;
-                if (selectedType === "free") {
+                
+                // selectedTypeがundefinedの場合の処理を追加
+                const selectedOption = $("#koma-select option:selected");
+                const selectedType = selectedOption.data("type");
+                
+                if (selectedType && selectedType === "free") {
                     komaMessage = `購入コマ数: 無料1コマ`;
                 }
-                
+
                 const selectedLectures = $(".lecture-checkbox:checked").map(function () {
                     return $(this).val();
                 }).get();
