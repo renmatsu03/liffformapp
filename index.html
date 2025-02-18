@@ -121,8 +121,7 @@
             $("#koma-select").change(function () {
                 const selectedOption = $("#koma-select option:selected");
                 const selectedValue = selectedOption.val();
-                const selectedType = selectedOption.data("type");
-                const maxSelection = selectedValue === "20" ? 20 : parseInt(selectedValue);
+                const maxSelection = selectionType === "free" ? 1 : (selectionType === "10" ? 10 : parseInt(selectionType) );
 
                 $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
                 $("#lecture-0").prop("disabled", true).prop("checked", false); // 第1回はデフォルトで無効化
