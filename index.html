@@ -148,11 +148,11 @@
             const updateSubmitButtonState = () => {
                 const selectedKoma = $("#koma-select").val();
                 const checkedCount = $(".lecture-checkbox:checked").length;
-                const maxSelection = selectedKoma === "20" ? 20 : parseInt(selectedKoma);
-
-                // 20コマ選択時は必ず20個チェックされるように調整
+                const maxSelection = selectedKoma === "free" ? 1 : parseInt(selectedKoma);
+                
                 $("input[type='submit']").prop("disabled", checkedCount !== maxSelection);
             };
+
 
             // LIFF 初期化
             liff.init({ liffId: liffId })
