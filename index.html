@@ -173,24 +173,31 @@
             });
 
         // フォーム送信処理
-        $("form").submit(function () {
-            const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
-            const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
-            const grade = $('select[name="grade"]').val();
-            const selectedKoma = $('#koma-select').val();
-            const selectedLectures = $(".lecture-checkbox:checked").map(function () {
-                return $(this).val();
-            }).get();
+$("form").submit(function () {
+    const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
+    const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
+    const grade = $('select[name="grade"]').val();
+    
+    const selectedOption = $('#koma-select option:selected');
+    const selectedKoma = selectedOption.val();
+    const selectedType = selectedOption.data("type");
+    
+    // メッセージ用のコマ数表記
+    let komaMessage = `購入コマ数: ${selectedKoma}コマ`;
+    if (selectedType === "free") {
+        komaMessage = `購入コマ数: 無料1コマ`;
+    }
 
-            const msg = `#中学受験ニガテ克服講座-申込フォーム\nLINE名: ${$('input[name="line-name"]').val()}\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma}コマ\n選択した講座:\n${selectedLectures.join("\n")}`;
+    const selectedLectures = $(".lecture-checkbox:checked").map(function () {
+        return $(this).val();
+    }).get();
 
-            liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
-                alert("メッセージが送信されました");
-                liff.closeWindow();
-            });
+    const msg = `#中学受験ニガテ克服講座-申込フォーム\nLINE名: ${$('input[name="line-name"]').val()}\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n${komaMessage}\n選択した講座:\n${selectedLectures.join("\n")}`;
 
-            return false;
-        });
-
+    liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
+        alert("メッセージが送信されました");
+        liff.closeWindow();
     });
-</script>
+
+    return false;
+});
