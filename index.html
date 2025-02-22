@@ -106,8 +106,9 @@
 
             // 講座リスト生成
             lectures.forEach((lecture, index) => {
-                const isDisabled = index === 0 ? "disabled" : "";
-                const labelStyle = index === 0 ? "style='text-decoration: line-through; color: gray;'" : "";
+                const isDisabled = (index === 0 || index === 1) ? "disabled" : "";
+                const labelStyle = (index === 0 || index === 1) ? "style='text-decoration: line-through; color: gray;'" : "";
+
 
                 $("#lecture-options").append(
                     `<div class="form-check">
@@ -123,7 +124,7 @@
     const maxSelection = selectedValue === "free" ? 1 : parseInt(selectedValue);
 
     $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
-    $("#lecture-0").prop("disabled", true).prop("checked", false); // 第1回は常に無効
+    $("#lecture-0, #lecture-1").prop("disabled", true).prop("checked", false); // 第1回と第2回は常に無効
 
     if (selectedValue === "20") {
         $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
