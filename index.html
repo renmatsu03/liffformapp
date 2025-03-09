@@ -1,204 +1,105 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>#中学受験ニガテ克服講座-申込フォーム</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <style>
-        .name-row, .furigana-row {
-            display: flex;
-            gap: 10px;
-        }
-        .name-row input, .furigana-row input {
-            flex: 1;
-        }
-        input[type="submit"] {
-            display: block;
-            width: 50%;
-            margin: 20px auto;
-            padding: 15px;
-            font-size: 1.2em;
-        }
-    </style>
-</head>
-<body>
-    <form class="w-75 mx-auto mt-5">
-        <!-- LINE名 -->
-        <p class="mt-3">LINE名</p>
-        <input class="form-control w-100 mt-1" name="line-name" placeholder="LINE名を取得中..." readonly>
+<script>
+    $(document).ready(function () {
+        const liffId = "2006792721-3gajN1ll"; // LIFF ID
 
-        <!-- 漢字氏名 -->
-        <p class="mt-3">生徒様のお名前（漢字）</p>
-        <div class="name-row">
-            <input class="form-control" name="last-name" placeholder="姓" required>
-            <input class="form-control" name="first-name" placeholder="名" required>
-        </div>
+        const lectures = [
+            "第1回：2/16（日） 9:00～10:00<br>~割合と比　食塩水~",
+            "第2回：2/23（日） 9:00～10:00<br>~割合と比　売買損益~",
+            "第3回：3/2（日） 9:00～10:00<br>~割合と比　倍数算~",
+            "第4回：3/9（日） 9:00～10:00<br>~速さ　旅人算~",
+            "第5回：3/16（日） 9:00～10:00<br>~速さ　速さと比~"
+        ];
 
-        <!-- ふりがな -->
-        <p class="mt-3">生徒様のお名前（ふりがな）</p>
-        <div class="furigana-row">
-            <input class="form-control" name="last-name-kana" placeholder="せい" required>
-            <input class="form-control" name="first-name-kana" placeholder="めい" required>
-        </div>
+        lectures.forEach((lecture, index) => {
+            const isDisabled = (index <= 3) ? "disabled" : "";
+            const labelStyle = (index <= 3) ? "style='text-decoration: line-through; color: gray;'" : "";
 
-        <!-- 学年 -->
-        <p class="mt-3">学年</p>
-        <select class="form-control w-100 mt-1" name="grade" required>
-            <option value="" disabled selected>選択してください</option>
-            <option>小学6年</option>
-            <option>小学5年</option>
-            <option>小学4年</option>
-            <option>小学3年</option>
-            <option>小学2年</option>
-            <option>小学1年</option>
-        </select>
+            $("#lecture-options").append(
+                `<div class="form-check">
+                    <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}" ${isDisabled}>
+                    <label class="form-check-label" for="lecture-${index}" ${labelStyle}>${lecture}</label>
+                </div>`
+            );
+        });
 
-        <!-- 講座の購入コマ数 -->
-        <p class="mt-3">講座の購入コマ数</p>
-        <select class="form-control w-100 mt-1" id="koma-select" name="koma" required>
-            <option value="" disabled selected>選択してください</option>
-            <option value="free">無料1コマ（★初回特典）</option>
-            <option value="1">1コマ（¥1,000）</option>
-            <option value="3">3コマ（¥2,700）★300円お得！</option>
-            <option value="5">5コマ（¥4,250）★750円お得！</option>
-            <option value="10">10コマ（¥8,000）★2コマ分お得！</option>
-            <option value="20">20コマ（¥15,000） ★5コマ分お得！</option>
-        </select>
+        $("#koma-select").change(function () {
+            const selectedValue = $(this).val();
+            const maxSelection = selectedValue === "free" ? 1 : parseInt(selectedValue);
 
-        <!-- 講座選択 -->
-        <p class="mt-3">講座選択</p>
-        <div id="lecture-options" class="form-group">
-            <!-- 講座リストを動的に生成 -->
-        </div>
+            $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
+            $("#lecture-0, #lecture-1, #lecture-2, #lecture-3").prop("disabled", true).prop("checked", false);
 
-        <input type="submit" class="mt-4 btn btn-primary" value="送信" disabled>
-    </form>
+            if (selectedValue === "20") {
+                $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
+            } else {
+                $(".lecture-checkbox").not("#lecture-0, #lecture-1, #lecture-2, #lecture-3").prop("disabled", false);
+            }
 
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
-    <script>
-        $(document).ready(function () {
-            const liffId = "2006792721-3gajN1ll"; // LIFF ID
+            $(".lecture-checkbox").not("#lecture-0, #lecture-1, #lecture-2, #lecture-3").off("change").on("change", function () {
+                if ($(".lecture-checkbox:checked").length >= maxSelection) {
+                    $(".lecture-checkbox:not(:checked)").not("#lecture-0, #lecture-1, #lecture-2, #lecture-3").prop("disabled", true);
+                } else {
+                    $(".lecture-checkbox").not("#lecture-0, #lecture-1, #lecture-2, #lecture-3").prop("disabled", false);
+                }
+                updateSubmitButtonState();
+            });
 
-            const lectures = [
-                "第1回：2/16（日） 9:00～10:00<br>~割合と比　食塩水~",
-                "第2回：2/23（日） 9:00～10:00<br>~割合と比　売買損益~",
-                "第3回：3/2（日） 9:00～10:00<br>~割合と比　倍数算~",
-                "第4回：3/9（日） 9:00～10:00<br>~速さ　旅人算~",
-                "第5回：3/16（日） 9:00～10:00<br>~速さ　速さと比~",
-                "第6回：3/23（日） 9:00～10:00<br>~速さ　ダイヤグラム~",
-                "第7回：3/30（日） 9:00～10:00<br>~和差算~",
-                "第8回：4/6（日） 9:00～10:00<br>~つるかめ算~",
-                "第9回：4/13（日） 9:00～10:00<br>~仕事算~",
-                "第10回：4/20（日） 9:00～10:00<br>~特殊算まとめ~",
-                "第11回：4/27（日） 9:00～10:00<br>~平面図形　面積の比、辺の比~",
-                "第12回：5/4（日） 9:00～10:00<br>~平面図形　多角形~",
-                "第13回：5/11（日） 9:00～10:00<br>~平面図形　図形の移動~",
-                "第14回：5/18（日） 9:00～10:00<br>~数と性質　規則性~",
-                "第15回：5/25（日） 9:00～10:00<br>~数と性質　約数倍数~",
-                "第16回：6/8（日） 9:00～10:00<br>~数と性質　分数や少数といった単純計算~",
-                "第17回：6/15（日） 9:00～10:00<br>~立体図形　体積、表面積~",
-                "第18回：6/22（日） 9:00～10:00<br>~立体図形　切断~",
-                "第19回：6/29（日） 9:00～10:00<br>~立体図形　回転体~",
-                "第20回：7/6（日） 9:00～10:00<br>~場合の数~"
-            ];
+            updateSubmitButtonState();
+        });
 
-            // 講座リスト生成
-lectures.forEach((lecture, index) => {
-    const isDisabled = (index === 0 || index === 1 || index === 2| index === 3) ? "disabled" : "";
-    const labelStyle = (index === 0 || index === 1 || index === 2| index === 3) ? "style='text-decoration: line-through; color: gray;'" : "";
-
-    $("#lecture-options").append(
-        `<div class="form-check">
-            <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}" ${isDisabled}>
-            <label class="form-check-label" for="lecture-${index}" ${labelStyle}>${lecture}</label>
-        </div>`
-    );
-});
-
-// コマ数選択時の処理
-$("#koma-select").change(function () {
-    const selectedValue = $(this).val();
-    const maxSelection = selectedValue === "free" ? 1 : parseInt(selectedValue);
-
-    $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
-    $("#lecture-0, #lecture-1, #lecture-2,#lecture-3").prop("disabled", true).prop("checked", false); // 第1回, 第2回, 第3回は常に無効
-
-    if (selectedValue === "20") {
-        $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
-        $("#lecture-0, #lecture-1, #lecture-2,#lecture-3").prop("checked", true).prop("disabled", true);
-    } else {
-        $(".lecture-checkbox:not(#lecture-0, #lecture-1, #lecture-2,#lecture-3)").prop("disabled", false);
-    }
-
-    $(".lecture-checkbox:not(#lecture-0, #lecture-1, #lecture-2)").off("change").on("change", function () {
-        if ($(".lecture-checkbox:checked").length >= maxSelection) {
-            $(".lecture-checkbox:not(:checked):not("#lecture-0, #lecture-1, #lecture-2,#lecture-3")").prop("disabled", true);
-        } else {
-            $(".lecture-checkbox:not("#lecture-0, #lecture-1, #lecture-2,#lecture-3")").prop("disabled", false);
-        }
-        updateSubmitButtonState();
-    });
-
-    updateSubmitButtonState();
-});
-
-
-            
-
-            const updateSubmitButtonState = () => {
-                const selectedKoma = $("#koma-select").val();
-                const checkedCount = $(".lecture-checkbox:checked").length;
-                const maxSelection = selectedKoma === "free" ? 1 : parseInt(selectedKoma);
+        const updateSubmitButtonState = () => {
+            const selectedKoma = $("#koma-select").val();
+            const checkedCount = $(".lecture-checkbox:checked").length;
+            const maxSelection = selectedKoma === "free" ? 1 : parseInt(selectedKoma);
             $("input[type='submit']").prop("disabled", checkedCount !== maxSelection);
-            };
+        };
 
-            // LIFF 初期化
-            liff.init({ liffId: liffId })
+        // LIFF 初期化
+        liff.init({ liffId: liffId })
+            .then(() => {
+                if (liff.isLoggedIn()) {
+                    liff.getProfile().then(profile => {
+                        $('input[name="line-name"]').val(profile.displayName);
+                    });
+                } else {
+                    liff.login();
+                }
+            });
+
+        // フォーム送信処理
+        $("form").submit(function (event) {
+            event.preventDefault();  // ページリロード防止
+
+            const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
+            const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
+            const grade = $('select[name="grade"]').val();
+            const selectedKoma = $('#koma-select').val();
+            const komaMessage = selectedKoma === "free" ? "購入コマ数: 無料1コマ" : `購入コマ数: ${selectedKoma}コマ`;
+
+            const selectedLectures = $(".lecture-checkbox:checked").map(function () {
+                return $(this).val();
+            }).get();
+
+            const msg = `#中学受験ニガテ克服講座-申込フォーム\n`
+                + `LINE名: ${$('input[name="line-name"]').val()}\n`
+                + `生徒様のお名前: ${name}\n`
+                + `ふりがな: ${nameKana}\n`
+                + `学年: ${grade}\n`
+                + `${komaMessage}\n`
+                + `選択した講座:\n${selectedLectures.join("\n")}`;
+
+            liff.sendMessages([{ type: 'text', text: msg }])
                 .then(() => {
-                    if (liff.isLoggedIn()) {
-                        liff.getProfile().then(profile => {
-                            $('input[name="line-name"]').val(profile.displayName);
-                        });
-                    } else {
-                        liff.login();
-                    }
+                    alert("メッセージが送信されました");
+                    liff.closeWindow();
+                })
+                .catch((error) => {
+                    console.error("送信エラー", error);
+                    alert("メッセージ送信に失敗しました");
                 });
 
-            // フォーム送信処理
-            $("form").submit(function (event) {
-    event.preventDefault();  // フォーム送信によるページリロード防止
-
-    const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
-    const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
-    const grade = $('select[name="grade"]').val();
-    const selectedKoma = $('#koma-select').val();
-
-    // ここを修正後のコードに置き換え
-    const selectedOption = $("#koma-select option:selected");
-    const selectedType = selectedOption.data("type");
-
-    let komaMessage = `購入コマ数: ${selectedKoma}コマ`;
-    if (selectedType && selectedType === "free") {
-        komaMessage = `購入コマ数: 無料1コマ`;
-    }
-
-    const selectedLectures = $(".lecture-checkbox:checked").map(function () {
-        return $(this).val();
-    }).get();
-
-    const msg = `#中学受験ニガテ克服講座-申込フォーム\nLINE名: ${$('input[name="line-name"]').val()}\n生徒様のお名前: ${name}\nふりがな: ${nameKana}\n学年: ${grade}\n購入コマ数: ${selectedKoma === "free" ? "初回無料" : selectedKoma + "コマ"}\n選択した講座:\n${selectedLectures.join("\n")}`;
-
-    liff.sendMessages([{ type: 'text', text: msg }]).then(() => {
-        alert("メッセージが送信されました");
-        liff.closeWindow();
-    });
-
-    return false;  // ページリロード防止
-});
-
+            return false;  // ページリロード防止
         });
-    </script>
-</body>
-</html>
+
+    });
+</script>
