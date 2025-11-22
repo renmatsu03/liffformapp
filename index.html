@@ -207,7 +207,7 @@
       $("#student-name-kanji, #student-name-furi, #grade-select, #teach-usage, #free-text").on("input change", validateForm);
       $(document).on("change", ".session-checkbox", validateForm);
 
-      // 送信処理
+// 送信処理
 $("#apply-form").on("submit", function(e) {
   e.preventDefault();
   if (!validateForm()) return false;
@@ -235,16 +235,16 @@ $("#apply-form").on("submit", function(e) {
   const message = msgLines.join("\n");
 
   // ▼（追加）GASへ送信するデータ
+  // 【修正箇所】キー名（GAS側で受け取る名前）: 変数名（上で定義した名前） の形式にします
   const payload = {
-  lineName,
-  studentNameKanji,
-  studentNameFuri,
-  grade,
-  sessions,     // name="sessions[]" から取得
-  teachUsage,
-  freeText
-};
-
+    lineName: lineName,
+    studentNameKanji: studentKanji, // 修正: 変数 studentKanji を代入
+    studentNameFuri: studentFuri,   // 修正: 変数 studentFuri を代入
+    grade: grade,
+    sessions: sessions,
+    teachUsage: teachUsage,
+    freeText: freeText
+  };
 
   // ▼（追加）GAS Web API へ POST
   fetch("https://script.google.com/macros/s/AKfycbxiL3E08j9zW80DblhXUyv_HsbSmWIxh21-UwTWUCVpDEcHhkmvt9WBrurmLIzLCeX8-w/exec", {
