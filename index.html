@@ -1,198 +1,379 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>#中学受験ニガテ克服講座-申込フォーム</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <style>
-        .name-row, .furigana-row {
-            display: flex;
-            gap: 10px;
-        }
-        .name-row input, .furigana-row input {
-            flex: 1;
-        }
-        input[type="submit"] {
-            display: block;
-            width: 50%;
-            margin: 20px auto;
-            padding: 15px;
-            font-size: 1.2em;
-        }
-    </style>
-</head>
-<body>
-    <form class="w-75 mx-auto mt-5">
-        <!-- LINE名 -->
-        <p class="mt-3">LINE名</p>
-        <input class="form-control w-100 mt-1" name="line-name" placeholder="LINE名を取得中..." readonly>
+'use client'
 
-        <!-- 漢字氏名 -->
-        <p class="mt-3">生徒様のお名前（漢字）</p>
-        <div class="name-row">
-            <input class="form-control" name="last-name" placeholder="姓" required>
-            <input class="form-control" name="first-name" placeholder="名" required>
+import { useState } from 'react'
+import liff from '@line/liff'
+
+interface StudyRoomFormProps {
+  lineName: string
+}
+
+interface FormData {
+  lastName: string
+  firstName: string
+  lastNameKana: string
+  firstNameKana: string
+  grade: string
+  selectedDates: string[]
+  teachUsage: string
+  question: string
+}
+
+const GRADE_OPTIONS = [
+  '小学6年生',
+  '小学5年生',
+  '小学4年生',
+  '小学3年生',
+  '小学2年生',
+  '小学1年生',
+  'その他（中学生）',
+  'その他（高校生）',
+]
+
+const DATE_OPTIONS = [
+  '2025/11/25（火）16:00-19:00',
+  '2025/11/27（水）16:00-19:00',
+  '2025/11/28（木）16:00-19:00',
+  '2025/11/29（金）16:00-19:00',
+  '2025/11/30（土）09:00-12:00',
+  '2025/12/01（月）16:00-19:00',
+  '2025/12/02（火）16:00-19:00',
+  '2025/12/04（木）16:00-19:00',
+  '2025/12/05（金）16:00-19:00',
+  '2025/12/06（土）09:00-12:00',
+]
+
+const TEACH_USAGE_OPTIONS = [
+  '複数回授業を受けたことがある',
+  '1回だけ授業を受けたことがある',
+  '生徒登録だけしているが授業は受けたことがない',
+  'Teachをまだ利用していない',
+]
+
+export default function StudyRoomForm({ lineName }: StudyRoomFormProps) {
+  const [formData, setFormData] = useState<FormData>({
+    lastName: '',
+    firstName: '',
+    lastNameKana: '',
+    firstNameKana: '',
+    grade: '',
+    selectedDates: [],
+    teachUsage: '',
+    question: '',
+  })
+
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const validateForm = (): boolean => {
+    const newErrors: Partial<Record<keyof FormData, string>> = {}
+
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = '姓を入力してください'
+    }
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = '名を入力してください'
+    }
+    if (!formData.lastNameKana.trim()) {
+      newErrors.lastNameKana = '姓（ふりがな）を入力してください'
+    }
+    if (!formData.firstNameKana.trim()) {
+      newErrors.firstNameKana = '名（ふりがな）を入力してください'
+    }
+    if (!formData.grade) {
+      newErrors.grade = '学年を選択してください'
+    }
+    if (formData.selectedDates.length === 0) {
+      newErrors.selectedDates = '希望日を1つ以上選択してください'
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleDateChange = (date: string) => {
+    setFormData((prev) => {
+      const newDates = prev.selectedDates.includes(date)
+        ? prev.selectedDates.filter((d) => d !== date)
+        : [...prev.selectedDates, date]
+      return { ...prev, selectedDates: newDates }
+    })
+    // エラーをクリア
+    if (errors.selectedDates) {
+      setErrors((prev) => ({ ...prev, selectedDates: undefined }))
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!validateForm()) {
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      // メッセージを構築
+      const fullName = `${formData.lastName} ${formData.firstName}`
+      const fullNameKana = `${formData.lastNameKana} ${formData.firstNameKana}`
+      const datesText = formData.selectedDates.join('\n')
+      const teachUsageText = formData.teachUsage || '未回答'
+      const questionText = formData.question || 'なし'
+
+      const message = `#自習室参加フォーム\n\n` +
+        `LINE名: ${lineName}\n` +
+        `生徒様のお名前（漢字）: ${fullName}\n` +
+        `生徒様のお名前（ふりがな）: ${fullNameKana}\n` +
+        `学年: ${formData.grade}\n\n` +
+        `希望日:\n${datesText}\n\n` +
+        `Teachのご利用状況: ${teachUsageText}\n` +
+        `質問・要望: ${questionText}`
+
+      // LINEメッセージを送信
+      await liff.sendMessages([
+        {
+          type: 'text',
+          text: message,
+        },
+      ])
+
+      alert('送信が完了しました！')
+      liff.closeWindow()
+    } catch (error) {
+      console.error('送信エラー:', error)
+      alert('送信に失敗しました。もう一度お試しください。')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* LINE名 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          LINE名 <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          value={lineName}
+          readOnly
+          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
+        />
+      </div>
+
+      {/* 生徒様のお名前（漢字） */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          生徒様のお名前（漢字） <span className="text-red-500">*</span>
+        </label>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <input
+              type="text"
+              placeholder="姓"
+              value={formData.lastName}
+              onChange={(e) => {
+                setFormData((prev) => ({ ...prev, lastName: e.target.value }))
+                if (errors.lastName) {
+                  setErrors((prev) => ({ ...prev, lastName: undefined }))
+                }
+              }}
+              className={`w-full px-3 py-2 border rounded-md ${
+                errors.lastName ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.lastName && (
+              <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
+            )}
+          </div>
+          <div>
+            <input
+              type="text"
+              placeholder="名"
+              value={formData.firstName}
+              onChange={(e) => {
+                setFormData((prev) => ({ ...prev, firstName: e.target.value }))
+                if (errors.firstName) {
+                  setErrors((prev) => ({ ...prev, firstName: undefined }))
+                }
+              }}
+              className={`w-full px-3 py-2 border rounded-md ${
+                errors.firstName ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.firstName && (
+              <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>
+            )}
+          </div>
         </div>
+      </div>
 
-        <!-- ふりがな -->
-        <p class="mt-3">生徒様のお名前（ふりがな）</p>
-        <div class="furigana-row">
-            <input class="form-control" name="last-name-kana" placeholder="せい" required>
-            <input class="form-control" name="first-name-kana" placeholder="めい" required>
+      {/* 生徒様のお名前（ふりがな） */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          生徒様のお名前（ふりがな） <span className="text-red-500">*</span>
+        </label>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <input
+              type="text"
+              placeholder="せい"
+              value={formData.lastNameKana}
+              onChange={(e) => {
+                setFormData((prev) => ({ ...prev, lastNameKana: e.target.value }))
+                if (errors.lastNameKana) {
+                  setErrors((prev) => ({ ...prev, lastNameKana: undefined }))
+                }
+              }}
+              className={`w-full px-3 py-2 border rounded-md ${
+                errors.lastNameKana ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.lastNameKana && (
+              <p className="text-red-500 text-xs mt-1">{errors.lastNameKana}</p>
+            )}
+          </div>
+          <div>
+            <input
+              type="text"
+              placeholder="めい"
+              value={formData.firstNameKana}
+              onChange={(e) => {
+                setFormData((prev) => ({ ...prev, firstNameKana: e.target.value }))
+                if (errors.firstNameKana) {
+                  setErrors((prev) => ({ ...prev, firstNameKana: undefined }))
+                }
+              }}
+              className={`w-full px-3 py-2 border rounded-md ${
+                errors.firstNameKana ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.firstNameKana && (
+              <p className="text-red-500 text-xs mt-1">{errors.firstNameKana}</p>
+            )}
+          </div>
         </div>
+      </div>
 
-        <!-- 学年 -->
-        <p class="mt-3">学年</p>
-        <select class="form-control w-100 mt-1" name="grade" required>
-            <option value="" disabled selected>選択してください</option>
-            <option>小学6年</option>
-            <option>小学5年</option>
-            <option>小学4年</option>
-            <option>小学3年</option>
-            <option>小学2年</option>
-            <option>小学1年</option>
-        </select>
-
-        <!-- 講座の購入コマ数 -->
-        <p class="mt-3">講座の購入コマ数</p>
-        <select class="form-control w-100 mt-1" id="koma-select" name="koma" required>
-            <option value="" disabled selected>選択してください</option>
-            <option value="free">無料1コマ（★初回特典）</option>
-            <option value="1">1コマ（¥1,000）</option>
-            <option value="3">3コマ（¥2,700）★300円お得！</option>
-            <option value="5">5コマ（¥4,250）★750円お得！</option>
-            <option value="10">10コマ（¥8,000）★2コマ分お得！</option>
-            <option value="20">20コマ（¥15,000） ★5コマ分お得！</option>
-        </select>
-
-        <!-- 講座選択 -->
-        <p class="mt-3">講座選択</p>
-        <div id="lecture-options" class="form-group">
-            <!-- 講座リストを動的に生成 -->
-        </div>
-
-        <input type="submit" class="mt-4 btn btn-primary" value="送信" disabled>
-    </form>
-
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
-    <script>
-     $(document).ready(function () {
-            const liffId = "2006792721-3gajN1ll"; // LIFF ID
-
-            const lectures = [
-                "第1回：2/16（日） 9:00～10:00<br>~割合と比　食塩水~",
-                "第2回：2/23（日） 9:00～10:00<br>~割合と比　売買損益~",
-                "第3回：3/2（日） 9:00～10:00<br>~割合と比　倍数算~",
-                "第4回：3/9（日） 9:00～10:00<br>~速さ　旅人算~",
-                "第5回：3/16（日） 9:00～10:00<br>~速さ　速さと比~",
-                "第6回：3/23（日） 9:00～10:00<br>~速さ　ダイヤグラム~",
-                "第7回：3/30（日） 9:00～10:00<br>~和差算~",
-                "第8回：4/6（日） 9:00～10:00<br>~つるかめ算~",
-                "第9回：4/13（日） 9:00～10:00<br>~仕事算~",
-                "第10回：4/20（日） 9:00～10:00<br>~特殊算まとめ~",
-                "第11回：4/27（日） 9:00～10:00<br>~平面図形　面積の比、辺の比~",
-                "第12回：5/4（日） 9:00～10:00<br>~平面図形　多角形~",
-                "第13回：5/11（日） 9:00～10:00<br>~平面図形　図形の移動~",
-                "第14回：5/18（日） 9:00～10:00<br>~数と性質　規則性~",
-                "第15回：5/25（日） 9:00～10:00<br>~数と性質　約数倍数~",
-                "第16回：6/8（日） 9:00～10:00<br>~数と性質　分数や少数といった単純計算~",
-                "第17回：6/15（日） 9:00～10:00<br>~立体図形　体積、表面積~",
-                "第18回：6/22（日） 9:00～10:00<br>~立体図形　切断~",
-                "第19回：6/29（日） 9:00～10:00<br>~立体図形　回転体~",
-                "第20回：7/6（日） 9:00～10:00<br>~場合の数~"
-            ];
-        lectures.forEach((lecture, index) => {
-            const isDisabled = (index <= 3) ? "disabled" : "";
-            const labelStyle = (index <= 3) ? "style='text-decoration: line-through; color: gray;'" : "";
-
-            $("#lecture-options").append(
-                `<div class="form-check">
-                    <input class="form-check-input lecture-checkbox" type="checkbox" value="${lecture}" id="lecture-${index}" ${isDisabled}>
-                    <label class="form-check-label" for="lecture-${index}" ${labelStyle}>${lecture}</label>
-                </div>`
-            );
-        });
-
-        $("#koma-select").change(function () {
-            const selectedValue = $(this).val();
-            const maxSelection = selectedValue === "free" ? 1 : parseInt(selectedValue);
-
-            $(".lecture-checkbox").prop("checked", false).prop("disabled", false);
-            $("#lecture-0, #lecture-1, #lecture-2, #lecture-3").prop("disabled", true).prop("checked", false);
-
-            if (selectedValue === "20") {
-                $(".lecture-checkbox").prop("checked", true).prop("disabled", true);
-            } else {
-                $(".lecture-checkbox").not("#lecture-0, #lecture-1, #lecture-2, #lecture-3").prop("disabled", false);
+      {/* 学年 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          学年 <span className="text-red-500">*</span>
+        </label>
+        <select
+          value={formData.grade}
+          onChange={(e) => {
+            setFormData((prev) => ({ ...prev, grade: e.target.value }))
+            if (errors.grade) {
+              setErrors((prev) => ({ ...prev, grade: undefined }))
             }
+          }}
+          className={`w-full px-3 py-2 border rounded-md ${
+            errors.grade ? 'border-red-500' : 'border-gray-300'
+          }`}
+        >
+          <option value="">選択してください</option>
+          {GRADE_OPTIONS.map((grade) => (
+            <option key={grade} value={grade}>
+              {grade}
+            </option>
+          ))}
+        </select>
+        {errors.grade && (
+          <p className="text-red-500 text-xs mt-1">{errors.grade}</p>
+        )}
+      </div>
 
-            $(".lecture-checkbox").not("#lecture-0, #lecture-1, #lecture-2, #lecture-3").off("change").on("change", function () {
-                if ($(".lecture-checkbox:checked").length >= maxSelection) {
-                    $(".lecture-checkbox:not(:checked)").not("#lecture-0, #lecture-1, #lecture-2, #lecture-3").prop("disabled", true);
-                } else {
-                    $(".lecture-checkbox").not("#lecture-0, #lecture-1, #lecture-2, #lecture-3").prop("disabled", false);
-                }
-                updateSubmitButtonState();
-            });
+      {/* 希望日 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          自習室に参加し保護者レポート受け取りを希望する日{' '}
+          <span className="text-red-500">*</span>
+        </label>
+        <div className="text-xs text-gray-600 mb-2 bg-blue-50 p-3 rounded-md">
+          <p className="font-semibold mb-1">※ご注意</p>
+          <p>
+            こちらで回答した日程には全て参加を必須とするものではございません。
+          </p>
+          <p>
+            参加する可能性が少しでもある日程はお気軽に選択してください。
+          </p>
+          <p>
+            またこの時間帯の中で一部の時間帯（例えば18:00-19:00だけ）の利用も可能です！
+          </p>
+        </div>
+        <div className="space-y-2 max-h-60 overflow-y-auto border border-gray-300 rounded-md p-3">
+          {DATE_OPTIONS.map((date) => (
+            <label
+              key={date}
+              className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
+            >
+              <input
+                type="checkbox"
+                checked={formData.selectedDates.includes(date)}
+                onChange={() => handleDateChange(date)}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span className="text-sm">{date}</span>
+            </label>
+          ))}
+        </div>
+        {errors.selectedDates && (
+          <p className="text-red-500 text-xs mt-1">{errors.selectedDates}</p>
+        )}
+      </div>
 
-            updateSubmitButtonState();
-        });
+      {/* Teachのご利用状況 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Teachのご利用状況
+        </label>
+        <select
+          value={formData.teachUsage}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, teachUsage: e.target.value }))
+          }
+          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+        >
+          <option value="">選択してください（任意）</option>
+          {TEACH_USAGE_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </div>
 
-        const updateSubmitButtonState = () => {
-            const selectedKoma = $("#koma-select").val();
-            const checkedCount = $(".lecture-checkbox:checked").length;
-            const maxSelection = selectedKoma === "free" ? 1 : parseInt(selectedKoma);
-            $("input[type='submit']").prop("disabled", checkedCount !== maxSelection);
-        };
+      {/* 質問・要望 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          オンライン自習室やレポートの受け取りに関して何かご質問があれば、ご自由に記入してください！
+        </label>
+        <textarea
+          value={formData.question}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, question: e.target.value }))
+          }
+          rows={4}
+          placeholder="ご質問・ご要望があればご記入ください（任意）"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+        />
+      </div>
 
-        // LIFF 初期化
-        liff.init({ liffId: liffId })
-            .then(() => {
-                if (liff.isLoggedIn()) {
-                    liff.getProfile().then(profile => {
-                        $('input[name="line-name"]').val(profile.displayName);
-                    });
-                } else {
-                    liff.login();
-                }
-            });
+      {/* 送信ボタン */}
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className={`w-full py-3 px-4 rounded-md font-medium text-white ${
+          isSubmitting
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-blue-600 hover:bg-blue-700'
+        }`}
+      >
+        {isSubmitting ? '送信中...' : '送信'}
+      </button>
+    </form>
+  )
+}
 
-        // フォーム送信処理
-        $("form").submit(function (event) {
-            event.preventDefault();  // ページリロード防止
-
-            const name = `${$('input[name="last-name"]').val()} ${$('input[name="first-name"]').val()}`;
-            const nameKana = `${$('input[name="last-name-kana"]').val()} ${$('input[name="first-name-kana"]').val()}`;
-            const grade = $('select[name="grade"]').val();
-            const selectedKoma = $('#koma-select').val();
-            const komaMessage = selectedKoma === "free" ? "購入コマ数: 無料1コマ" : `購入コマ数: ${selectedKoma}コマ`;
-
-            const selectedLectures = $(".lecture-checkbox:checked").map(function () {
-                return $(this).val();
-            }).get();
-
-            const msg = `#中学受験ニガテ克服講座-申込フォーム\n`
-                + `LINE名: ${$('input[name="line-name"]').val()}\n`
-                + `生徒様のお名前: ${name}\n`
-                + `ふりがな: ${nameKana}\n`
-                + `学年: ${grade}\n`
-                + `${komaMessage}\n`
-                + `選択した講座:\n${selectedLectures.join("\n")}`;
-
-            liff.sendMessages([{ type: 'text', text: msg }])
-                .then(() => {
-                    alert("メッセージが送信されました");
-                    liff.closeWindow();
-                })
-                .catch((error) => {
-                    console.error("送信エラー", error);
-                    alert("メッセージ送信に失敗しました");
-                });
-
-            return false;  // ページリロード防止
-        });
-
-    });
-</script>
