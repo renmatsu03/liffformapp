@@ -203,31 +203,50 @@
       $(document).on("change", ".session-checkbox", validateForm);
 
       // 送信処理
-      $("#apply-form").on("submit", function(e) {
-        e.preventDefault();
-        if (!validateForm()) return false;
+$("#apply-form").on("submit", function(e) {
+  e.preventDefault();
+  if (!validateForm()) return false;
 
-        const lineName = $("#line-name").val().trim();
-        const studentKanji = $("#student-name-kanji").val().trim();
-        const studentFuri = $("#student-name-furi").val().trim();
-        const grade = $("#grade-select").val();
-        const sessions = $(".session-checkbox:checked").map(function(){ return $(this).val(); }).get();
-        const teachUsage = $("#teach-usage").val() || "未選択";
-        const freeText = $("#free-text").val().trim() || "特になし";
+  const lineName = $("#line-name").val().trim();
+  const studentKanji = $("#student-name-kanji").val().trim();
+  const studentFuri = $("#student-name-furi").val().trim();
+  const grade = $("#grade-select").val();
+  const sessions = $(".session-checkbox:checked").map(function(){ return $(this).val(); }).get();
+  const teachUsage = $("#teach-usage").val() || "未選択";
+  const freeText = $("#free-text").val().trim() || "特になし";
 
-        // 送信メッセージ整形（LINEへ）
-        const msgLines = [
-          "#オンライン自習室参加申込",
-          `LINE名: ${lineName}`,
-          `生徒名（漢字）: ${studentKanji}`,
-          `生徒名（ふりがな）: ${studentFuri}`,
-          `学年: ${grade}`,
-          "参加希望日（保護者レポート受け取り）:",
-          sessions.map(s => `- ${s}`).join("\n"),
-          `Teachの利用状況: ${teachUsage}`,
-          `備考: ${freeText}`
-        ];
-        const message = msgLines.join("\n");
+  // LINEに送るメッセージ
+  const msgLines = [
+    "#オンライン自習室参加申込",
+    `LINE名: ${lineName}`,
+    `生徒名（漢字）: ${studentKanji}`,
+    `生徒名（ふりがな）: ${studentFuri}`,
+    `学年: ${grade}`,
+    "参加希望日（保護者レポート受け取り）:",
+    sessions.map(s => `- ${s}`).join("\n"),
+    `Teachの利用状況: ${teachUsage}`,
+    `備考: ${freeText}`
+  ];
+  const message = msgLines.join("\n");
+
+  // ▼（追加）GASへ送信するデータ
+  const payload = {
+    lineName: lineName,
+    studentNameKanji: studentKanji,
+    studentNameFuri: studentFuri,
+    grade: grade,
+    sessions: sessions,
+    teachUsage: teachUsage,
+    freeText: freeText
+  };
+
+  // ▼（追加）GAS Web API へ POST
+  fetch("https://script.google.com/macros/s/AKfycbznI4zxo6pDzQekRJ23SshDlufKRvuR0QPqE-kBTOvjMLpvjfMsM3tsEsBstpfzCKX2Bg/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
 
         // LIFF内から送信
         if (liff.isInClient()) {
