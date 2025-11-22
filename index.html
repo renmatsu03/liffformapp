@@ -35,6 +35,7 @@
       <div class="form-group">
         <label>生徒様のお名前（ふりがな） <span class="required">*</span></label>
         <input type="text" class="form-control" id="student-name-furi" name="studentNameFuri" required placeholder="例：やまだ たろう">
+
       </div>
 
       <!-- 学年 -->
@@ -66,43 +67,43 @@
       <div class="form-group">
         <label>自習室に参加し保護者レポート受け取りを希望する日（複数選択） <span class="required">*</span></label>
         <div class="form-check">
-          <input class="form-check-input session-checkbox" type="checkbox" value="2025/11/25（火）16:00-19:00" id="d1">
+          <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]" value="2025/11/25（火）16:00-19:00" id="d1">
           <label class="form-check-label" for="d1">2025/11/25（火）16:00-19:00</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input session-checkbox" type="checkbox" value="2025/11/27（水）16:00-19:00" id="d2">
+          <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]"  value="2025/11/27（水）16:00-19:00" id="d2">
           <label class="form-check-label" for="d2">2025/11/27（水）16:00-19:00</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input session-checkbox" type="checkbox" value="2025/11/28（木）16:00-19:00" id="d3">
+          <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]"  value="2025/11/28（木）16:00-19:00" id="d3">
           <label class="form-check-label" for="d3">2025/11/28（木）16:00-19:00</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input session-checkbox" type="checkbox" value="2025/11/29（金）16:00-19:00" id="d4">
+          <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]"  value="2025/11/29（金）16:00-19:00" id="d4">
           <label class="form-check-label" for="d4">2025/11/29（金）16:00-19:00</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input session-checkbox" type="checkbox" value="2025/11/30（土）09:00-12:00" id="d5">
+          <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]"  value="2025/11/30（土）09:00-12:00" id="d5">
           <label class="form-check-label" for="d5">2025/11/30（土）09:00-12:00</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input session-checkbox" type="checkbox" value="2025/12/01（月）16:00-19:00" id="d6">
+          <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]"  value="2025/12/01（月）16:00-19:00" id="d6">
           <label class="form-check-label" for="d6">2025/12/01（月）16:00-19:00</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input session-checkbox" type="checkbox" value="2025/12/02（火）16:00-19:00" id="d7">
+          <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]"  value="2025/12/02（火）16:00-19:00" id="d7">
           <label class="form-check-label" for="d7">2025/12/02（火）16:00-19:00</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input session-checkbox" type="checkbox" value="2025/12/04（木）16:00-19:00" id="d8">
+          <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]" value="2025/12/04（木）16:00-19:00" id="d8">
           <label class="form-check-label" for="d8">2025/12/04（木）16:00-19:00</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input session-checkbox" type="checkbox" value="2025/12/05（金）16:00-19:00" id="d9">
+          <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]"  value="2025/12/05（金）16:00-19:00" id="d9">
           <label class="form-check-label" for="d9">2025/12/05（金）16:00-19:00</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input session-checkbox" type="checkbox" value="2025/12/06（土）09:00-12:00" id="d10">
+          <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]"  value="2025/12/06（土）09:00-12:00" id="d10">
           <label class="form-check-label" for="d10">2025/12/06（土）09:00-12:00</label>
         </div>
         <small class="form-text text-muted">※最低1つ以上選択してください。上限はありません。</small>
@@ -231,17 +232,18 @@ $("#apply-form").on("submit", function(e) {
 
   // ▼（追加）GASへ送信するデータ
   const payload = {
-    lineName: lineName,
-    studentNameKanji: studentKanji,
-    studentNameFuri: studentFuri,
-    grade: grade,
-    sessions: sessions,
-    teachUsage: teachUsage,
-    freeText: freeText
-  };
+  lineName,
+  studentNameKanji,
+  studentNameFuri,
+  grade,
+  sessions,     // name="sessions[]" から取得
+  teachUsage,
+  freeText
+};
+
 
   // ▼（追加）GAS Web API へ POST
-  fetch("https://script.google.com/macros/s/AKfycbxv79nUpNNxA4FQc4v1KM8tlcgQouJOasDBbB0h_cErTejoiEghgHZ6r3fM3f86SzVEdg/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbxiL3E08j9zW80DblhXUyv_HsbSmWIxh21-UwTWUCVpDEcHhkmvt9WBrurmLIzLCeX8-w/exec", {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
