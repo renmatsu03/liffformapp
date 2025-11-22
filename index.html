@@ -248,24 +248,22 @@ $("#apply-form").on("submit", function(e) {
     body: JSON.stringify(payload)
   });
 
-        // LIFF内から送信
-        if (liff.isInClient()) {
-          liff.sendMessages([{ type: 'text', text: message }])
-            .then(() => {
-              alert("申込内容が送信されました。運営よりご連絡いたします。");
-              liff.closeWindow();
-            })
-            .catch(err => {
-              console.error("メッセージ送信失敗:", err);
-              alert("送信に失敗しました。時間をおいて再度お試しください。");
-            });
-        } else {
-          // LIFF外なら内容を確認してもらう（デバッグや非LINE環境向け）
-          alert("LINEアプリ内で実行してください。\n\n送信内容のプレビューはコンソールに出力します。");
-          console.log("送信メッセージ：\n", message);
-        }
-        return false;
+  // ▼ メッセージ送信（LINE）
+  if (liff.isInClient()) {
+    liff.sendMessages([{ type: 'text', text: message }])
+      .then(() => {
+        alert("申込内容が送信されました。運営よりご連絡いたします。");
+        liff.closeWindow();
+      })
+      .catch(err => {
+        console.error("メッセージ送信失敗:", err);
+        alert("送信に失敗しました。時間をおいて再度お試しください。");
       });
+  } else {
+    alert("LINEアプリ内で実行してください。");
+  }
+});
+
 
       // ページ読み込み時の初期検証
       validateForm();
