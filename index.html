@@ -28,15 +28,23 @@
       <!-- 生徒名（漢字） -->
       <div class="form-group">
         <label>生徒様のお名前（漢字） <span class="required">*</span></label>
-        <input type="text" class="form-control" id="student-name-kanji" name="studentNameKanji" required placeholder="例：山田 太郎">
-      </div>
+      
+    　 <div style="display: flex; gap: 10px;">
+    <input type="text" class="form-control" id="student-lastname-kanji" name="studentLastNameKanji" required placeholder="例：山田" style="flex:1;">
+    <input type="text" class="form-control" id="student-firstname-kanji" name="studentFirstNameKanji" required placeholder="例：太郎" style="flex:1;">
+  </div>
+</div>
 
-      <!-- 生徒名（ふりがな） -->
-      <div class="form-group">
-        <label>生徒様のお名前（ふりがな） <span class="required">*</span></label>
-        <input type="text" class="form-control" id="student-name-furi" name="studentNameFuri" required placeholder="例：やまだ たろう">
+<!-- 生徒名（ふりがな） -->
+<div class="form-group">
+  <label>生徒様のお名前（ふりがな） <span class="required">*</span></label>
 
-      </div>
+  <div style="display: flex; gap: 10px;">
+    <input type="text" class="form-control" id="student-lastname-furi" name="studentLastNameFuri" required placeholder="例：やまだ" style="flex:1;">
+    <input type="text" class="form-control" id="student-firstname-furi" name="studentFirstNameFuri" required placeholder="例：たろう" style="flex:1;">
+  </div>
+</div>
+
 
       <!-- 学年 -->
       <div class="form-group">
@@ -72,19 +80,19 @@
         </div>
         <div class="form-check">
           <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]"  value="2025/11/27（水）16:00-19:00" id="d2">
-          <label class="form-check-label" for="d2">2025/11/27（水）16:00-19:00</label>
+          <label class="form-check-label" for="d2">2025/11/26（水）16:00-19:00</label>
         </div>
         <div class="form-check">
           <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]"  value="2025/11/28（木）16:00-19:00" id="d3">
-          <label class="form-check-label" for="d3">2025/11/28（木）16:00-19:00</label>
+          <label class="form-check-label" for="d3">2025/11/27（木）16:00-19:00</label>
         </div>
         <div class="form-check">
           <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]"  value="2025/11/29（金）16:00-19:00" id="d4">
-          <label class="form-check-label" for="d4">2025/11/29（金）16:00-19:00</label>
+          <label class="form-check-label" for="d4">2025/11/28（金）16:00-19:00</label>
         </div>
         <div class="form-check">
           <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]"  value="2025/11/30（土）09:00-12:00" id="d5">
-          <label class="form-check-label" for="d5">2025/11/30（土）09:00-12:00</label>
+          <label class="form-check-label" for="d5">2025/11/29（土）09:00-12:00</label>
         </div>
         <div class="form-check">
           <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]"  value="2025/12/01（月）16:00-19:00" id="d6">
@@ -104,7 +112,7 @@
         </div>
         <div class="form-check">
           <input class="form-check-input session-checkbox" type="checkbox" name="sessions[]"  value="2025/12/06（土）09:00-12:00" id="d10">
-          <label class="form-check-label" for="d10">2025/12/06（土）09:00-12:00</label>
+          <label class="form-check-label" for="d10">2025/12/06（土）16:00-19:00</label>
         </div>
         <small class="form-text text-muted">※最低1つ以上選択してください。上限はありません。</small>
       </div>
