@@ -141,37 +141,64 @@
   <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
   <script>
     window.onerror = function(message, source, lineno, colno, error) {
-      alert("JSエラー:" + message);
+      console.error("JSエラー:", message, "at", source, "line", lineno);
+      // デバッグ用：本番環境では削除またはコメントアウト
+      // alert("JSエラー:" + message);
     };
 
-    $(function() {
+    // jQueryが読み込まれたことを確認
+    if (typeof jQuery === 'undefined') {
+      console.error("jQueryが読み込まれていません");
+    }
+
+    $(document).ready(function() {
       const liffId = "2006856244-4nX8lL5Y"; // 必要に応じて置き換えてください
 
       // フォームのバリデーション（最低1個のチェックを含む）
       function validateForm() {
-        const lineName = $("#line-name").val().trim();
-        // 【修正】姓と名を結合して取得
-        const studentKanji = ($("#student-lastname-kanji").val().trim() + " " + $("#student-firstname-kanji").val().trim()).trim();
-        const studentFuri = ($("#student-lastname-furi").val().trim() + " " + $("#student-firstname-furi").val().trim()).trim();
-        const grade = $("#grade-select").val();
+        // 要素が存在するか確認（安全のため）
+        const $lineName = $("#line-name");
+        const $lastnameKanji = $("#student-lastname-kanji");
+        const $firstnameKanji = $("#student-firstname-kanji");
+        const $lastnameFuri = $("#student-lastname-furi");
+        const $firstnameFuri = $("#student-firstname-furi");
+        const $gradeSelect = $("#grade-select");
+        
+        // 要素が存在しない場合は早期リターン
+        if (!$lineName.length || !$lastnameKanji.length || !$firstnameKanji.length || 
+            !$lastnameFuri.length || !$firstnameFuri.length || !$gradeSelect.length) {
+          console.error("必要なフォーム要素が見つかりません");
+          return false;
+        }
+        
+        const lineName = $lineName.val() ? $lineName.val().trim() : "";
+        // 【修正】姓と名を結合して取得（nullチェック付き）
+        const lastnameKanji = $lastnameKanji.val() ? $lastnameKanji.val().trim() : "";
+        const firstnameKanji = $firstnameKanji.val() ? $firstnameKanji.val().trim() : "";
+        const lastnameFuri = $lastnameFuri.val() ? $lastnameFuri.val().trim() : "";
+        const firstnameFuri = $firstnameFuri.val() ? $firstnameFuri.val().trim() : "";
+        
+        const studentKanji = (lastnameKanji + " " + firstnameKanji).trim();
+        const studentFuri = (lastnameFuri + " " + firstnameFuri).trim();
+        const grade = $gradeSelect.val() || "";
         const sessionsChecked = $(".session-checkbox:checked").length;
 
         // 必須条件
         const ok = lineName !== "" &&
-                   $("#student-lastname-kanji").val().trim() !== "" &&
-                   $("#student-firstname-kanji").val().trim() !== "" &&
-                   $("#student-lastname-furi").val().trim() !== "" &&
-                   $("#student-firstname-furi").val().trim() !== "" &&
-                   grade !== null && grade !== "" &&
+                   lastnameKanji !== "" &&
+                   firstnameKanji !== "" &&
+                   lastnameFuri !== "" &&
+                   firstnameFuri !== "" &&
+                   grade !== "" &&
                    sessionsChecked >= 1;
 
         // エラーメッセージ（簡易）
         const errors = [];
         if (!lineName) errors.push("LINE名が取得できていません。LINEアプリ内で実行してください。");
-        if (!$("#student-lastname-kanji").val().trim()) errors.push("生徒様のお名前（漢字・姓）を入力してください。");
-        if (!$("#student-firstname-kanji").val().trim()) errors.push("生徒様のお名前（漢字・名）を入力してください。");
-        if (!$("#student-lastname-furi").val().trim()) errors.push("生徒様のお名前（ふりがな・姓）を入力してください。");
-        if (!$("#student-firstname-furi").val().trim()) errors.push("生徒様のお名前（ふりがな・名）を入力してください。");
+        if (!lastnameKanji) errors.push("生徒様のお名前（漢字・姓）を入力してください。");
+        if (!firstnameKanji) errors.push("生徒様のお名前（漢字・名）を入力してください。");
+        if (!lastnameFuri) errors.push("生徒様のお名前（ふりがな・姓）を入力してください。");
+        if (!firstnameFuri) errors.push("生徒様のお名前（ふりがな・名）を入力してください。");
         if (!grade) errors.push("学年を選択してください。");
         if (sessionsChecked < 1) errors.push("自習室参加希望日は最低1つ以上選択してください。");
 
@@ -223,14 +250,29 @@
         e.preventDefault();
         if (!validateForm()) return false;
 
-        const lineName = $("#line-name").val().trim();
+        // 安全に値を取得（nullチェック付き）
+        const $lineName = $("#line-name");
+        const $lastnameKanji = $("#student-lastname-kanji");
+        const $firstnameKanji = $("#student-firstname-kanji");
+        const $lastnameFuri = $("#student-lastname-furi");
+        const $firstnameFuri = $("#student-firstname-furi");
+        const $gradeSelect = $("#grade-select");
+        const $teachUsage = $("#teach-usage");
+        const $freeText = $("#free-text");
+        
+        const lineName = $lineName.val() ? $lineName.val().trim() : "";
         // 【修正】姓と名を結合して取得
-        const studentKanji = ($("#student-lastname-kanji").val().trim() + " " + $("#student-firstname-kanji").val().trim()).trim();
-        const studentFuri = ($("#student-lastname-furi").val().trim() + " " + $("#student-firstname-furi").val().trim()).trim();
-        const grade = $("#grade-select").val();
+        const lastnameKanji = $lastnameKanji.val() ? $lastnameKanji.val().trim() : "";
+        const firstnameKanji = $firstnameKanji.val() ? $firstnameKanji.val().trim() : "";
+        const lastnameFuri = $lastnameFuri.val() ? $lastnameFuri.val().trim() : "";
+        const firstnameFuri = $firstnameFuri.val() ? $firstnameFuri.val().trim() : "";
+        
+        const studentKanji = (lastnameKanji + " " + firstnameKanji).trim();
+        const studentFuri = (lastnameFuri + " " + firstnameFuri).trim();
+        const grade = $gradeSelect.val() || "";
         const sessions = $(".session-checkbox:checked").map(function(){ return $(this).val(); }).get();
-        const teachUsage = $("#teach-usage").val() || "未選択";
-        const freeText = $("#free-text").val().trim() || "特になし";
+        const teachUsage = $teachUsage.val() || "未選択";
+        const freeText = $freeText.val() ? $freeText.val().trim() : "特になし";
 
         // LINEに送るメッセージ
         const msgLines = [
