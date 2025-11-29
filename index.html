@@ -28,23 +28,20 @@
       <!-- 生徒名（漢字） -->
       <div class="form-group">
         <label>生徒様のお名前（漢字） <span class="required">*</span></label>
-      
-    　 <div style="display: flex; gap: 10px;">
-    <input type="text" class="form-control" id="student-lastname-kanji" name="studentLastNameKanji" required placeholder="例：山田" style="flex:1;">
-    <input type="text" class="form-control" id="student-firstname-kanji" name="studentFirstNameKanji" required placeholder="例：太郎" style="flex:1;">
-  </div>
-</div>
+        <div style="display: flex; gap: 10px;">
+          <input type="text" class="form-control" id="student-lastname-kanji" name="studentLastNameKanji" required placeholder="例：山田" style="flex:1;">
+          <input type="text" class="form-control" id="student-firstname-kanji" name="studentFirstNameKanji" required placeholder="例：太郎" style="flex:1;">
+        </div>
+      </div>
 
-<!-- 生徒名（ふりがな） -->
-<div class="form-group">
-  <label>生徒様のお名前（ふりがな） <span class="required">*</span></label>
-
-  <div style="display: flex; gap: 10px;">
-    <input type="text" class="form-control" id="student-lastname-furi" name="studentLastNameFuri" required placeholder="例：やまだ" style="flex:1;">
-    <input type="text" class="form-control" id="student-firstname-furi" name="studentFirstNameFuri" required placeholder="例：たろう" style="flex:1;">
-  </div>
-</div>
-
+      <!-- 生徒名（ふりがな） -->
+      <div class="form-group">
+        <label>生徒様のお名前（ふりがな） <span class="required">*</span></label>
+        <div style="display: flex; gap: 10px;">
+          <input type="text" class="form-control" id="student-lastname-furi" name="studentLastNameFuri" required placeholder="例：やまだ" style="flex:1;">
+          <input type="text" class="form-control" id="student-firstname-furi" name="studentFirstNameFuri" required placeholder="例：たろう" style="flex:1;">
+        </div>
+      </div>
 
       <!-- 学年 -->
       <div class="form-group">
@@ -144,32 +141,37 @@
   <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
   <script>
     window.onerror = function(message, source, lineno, colno, error) {
-  alert("JSエラー:" + message);
-};
-    
+      alert("JSエラー:" + message);
+    };
+
     $(function() {
       const liffId = "2006856244-4nX8lL5Y"; // 必要に応じて置き換えてください
 
       // フォームのバリデーション（最低1個のチェックを含む）
       function validateForm() {
         const lineName = $("#line-name").val().trim();
-        const studentKanji = $("#student-name-kanji").val().trim();
-        const studentFuri = $("#student-name-furi").val().trim();
+        // 【修正】姓と名を結合して取得
+        const studentKanji = ($("#student-lastname-kanji").val().trim() + " " + $("#student-firstname-kanji").val().trim()).trim();
+        const studentFuri = ($("#student-lastname-furi").val().trim() + " " + $("#student-firstname-furi").val().trim()).trim();
         const grade = $("#grade-select").val();
         const sessionsChecked = $(".session-checkbox:checked").length;
 
         // 必須条件
         const ok = lineName !== "" &&
-                   studentKanji !== "" &&
-                   studentFuri !== "" &&
+                   $("#student-lastname-kanji").val().trim() !== "" &&
+                   $("#student-firstname-kanji").val().trim() !== "" &&
+                   $("#student-lastname-furi").val().trim() !== "" &&
+                   $("#student-firstname-furi").val().trim() !== "" &&
                    grade !== null && grade !== "" &&
                    sessionsChecked >= 1;
 
         // エラーメッセージ（簡易）
         const errors = [];
         if (!lineName) errors.push("LINE名が取得できていません。LINEアプリ内で実行してください。");
-        if (!studentKanji) errors.push("生徒様のお名前（漢字）を入力してください。");
-        if (!studentFuri) errors.push("生徒様のお名前（ふりがな）を入力してください。");
+        if (!$("#student-lastname-kanji").val().trim()) errors.push("生徒様のお名前（漢字・姓）を入力してください。");
+        if (!$("#student-firstname-kanji").val().trim()) errors.push("生徒様のお名前（漢字・名）を入力してください。");
+        if (!$("#student-lastname-furi").val().trim()) errors.push("生徒様のお名前（ふりがな・姓）を入力してください。");
+        if (!$("#student-firstname-furi").val().trim()) errors.push("生徒様のお名前（ふりがな・名）を入力してください。");
         if (!grade) errors.push("学年を選択してください。");
         if (sessionsChecked < 1) errors.push("自習室参加希望日は最低1つ以上選択してください。");
 
@@ -212,72 +214,73 @@
         });
 
       // 入力や選択が変わったら検証
-      $("#student-name-kanji, #student-name-furi, #grade-select, #teach-usage, #free-text").on("input change", validateForm);
+      // 【修正】正しいIDを指定
+      $("#student-lastname-kanji, #student-firstname-kanji, #student-lastname-furi, #student-firstname-furi, #grade-select, #teach-usage, #free-text").on("input change", validateForm);
       $(document).on("change", ".session-checkbox", validateForm);
 
-// 送信処理
-$("#apply-form").on("submit", function(e) {
-  e.preventDefault();
-  if (!validateForm()) return false;
+      // 送信処理
+      $("#apply-form").on("submit", function(e) {
+        e.preventDefault();
+        if (!validateForm()) return false;
 
-  const lineName = $("#line-name").val().trim();
-  const studentKanji = $("#student-name-kanji").val().trim();
-  const studentFuri = $("#student-name-furi").val().trim();
-  const grade = $("#grade-select").val();
-  const sessions = $(".session-checkbox:checked").map(function(){ return $(this).val(); }).get();
-  const teachUsage = $("#teach-usage").val() || "未選択";
-  const freeText = $("#free-text").val().trim() || "特になし";
+        const lineName = $("#line-name").val().trim();
+        // 【修正】姓と名を結合して取得
+        const studentKanji = ($("#student-lastname-kanji").val().trim() + " " + $("#student-firstname-kanji").val().trim()).trim();
+        const studentFuri = ($("#student-lastname-furi").val().trim() + " " + $("#student-firstname-furi").val().trim()).trim();
+        const grade = $("#grade-select").val();
+        const sessions = $(".session-checkbox:checked").map(function(){ return $(this).val(); }).get();
+        const teachUsage = $("#teach-usage").val() || "未選択";
+        const freeText = $("#free-text").val().trim() || "特になし";
 
-  // LINEに送るメッセージ
-  const msgLines = [
-    "#オンライン自習室参加申込",
-    `LINE名: ${lineName}`,
-    `生徒名（漢字）: ${studentKanji}`,
-    `生徒名（ふりがな）: ${studentFuri}`,
-    `学年: ${grade}`,
-    "参加希望日（保護者レポート受け取り）:",
-    sessions.map(s => `- ${s}`).join("\n"),
-    `Teachの利用状況: ${teachUsage}`,
-    `備考: ${freeText}`
-  ];
-  const message = msgLines.join("\n");
+        // LINEに送るメッセージ
+        const msgLines = [
+          "#オンライン自習室参加申込",
+          `LINE名: ${lineName}`,
+          `生徒名（漢字）: ${studentKanji}`,
+          `生徒名（ふりがな）: ${studentFuri}`,
+          `学年: ${grade}`,
+          "参加希望日（保護者レポート受け取り）:",
+          sessions.map(s => `- ${s}`).join("\n"),
+          `Teachの利用状況: ${teachUsage}`,
+          `備考: ${freeText}`
+        ];
+        const message = msgLines.join("\n");
 
-  // ▼（追加）GASへ送信するデータ
-  // 【修正箇所】キー名（GAS側で受け取る名前）: 変数名（上で定義した名前） の形式にします
-  const payload = {
-    lineName: lineName,
-    studentNameKanji: studentKanji, // 修正: 変数 studentKanji を代入
-    studentNameFuri: studentFuri,   // 修正: 変数 studentFuri を代入
-    grade: grade,
-    sessions: sessions,
-    teachUsage: teachUsage,
-    freeText: freeText
-  };
+        // ▼（追加）GASへ送信するデータ
+        // 【修正】キー名（GAS側で受け取る名前）: 変数名（上で定義した名前） の形式にします
+        const payload = {
+          lineName: lineName,
+          studentNameKanji: studentKanji, // 修正: 変数 studentKanji を代入
+          studentNameFuri: studentFuri,   // 修正: 変数 studentFuri を代入
+          grade: grade,
+          sessions: sessions,
+          teachUsage: teachUsage,
+          freeText: freeText
+        };
 
-  // ▼（追加）GAS Web API へ POST
-  fetch("https://script.google.com/macros/s/AKfycbxiL3E08j9zW80DblhXUyv_HsbSmWIxh21-UwTWUCVpDEcHhkmvt9WBrurmLIzLCeX8-w/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
+        // ▼（追加）GAS Web API へ POST
+        fetch("https://script.google.com/macros/s/AKfycbxiL3E08j9zW80DblhXUyv_HsbSmWIxh21-UwTWUCVpDEcHhkmvt9WBrurmLIzLCeX8-w/exec", {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
 
-  // ▼ メッセージ送信（LINE）
-  if (liff.isInClient()) {
-    liff.sendMessages([{ type: 'text', text: message }])
-      .then(() => {
-        alert("申込内容が送信されました。運営よりご連絡いたします。");
-        liff.closeWindow();
-      })
-      .catch(err => {
-        console.error("メッセージ送信失敗:", err);
-        alert("送信に失敗しました。時間をおいて再度お試しください。");
+        // ▼ メッセージ送信（LINE）
+        if (liff.isInClient()) {
+          liff.sendMessages([{ type: 'text', text: message }])
+            .then(() => {
+              alert("申込内容が送信されました。運営よりご連絡いたします。");
+              liff.closeWindow();
+            })
+            .catch(err => {
+              console.error("メッセージ送信失敗:", err);
+              alert("送信に失敗しました。時間をおいて再度お試しください。");
+            });
+        } else {
+          alert("LINEアプリ内で実行してください。");
+        }
       });
-  } else {
-    alert("LINEアプリ内で実行してください。");
-  }
-});
-
 
       // ページ読み込み時の初期検証
       validateForm();
@@ -285,3 +288,4 @@ $("#apply-form").on("submit", function(e) {
   </script>
 </body>
 </html>
+
